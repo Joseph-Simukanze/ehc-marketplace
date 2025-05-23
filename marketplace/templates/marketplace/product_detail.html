@@ -1,0 +1,167 @@
+ {% extends 'base.html' %} {% block title %} {{ product.title }} - EHC Marketplace {% endblock %} {% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'marketplace:home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'marketplace:product_list' %}">Products</a></li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'marketplace:product_list' %}?category={{ product.category.id }}">{{ product.category.name }}</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <!-- Product Image -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.title }}" style="max-height: 500px; object-fit: contain;" onerror="this.src='https://via.placeholder.com/600x400?text=Product+Image'">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">Posted {{ product.date_posted|timesince }} ago</span>
+                    <span class="text-muted">Location: {{ product.location }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details -->
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">{{ product.title }}</h4>
+            </div>
+            <div class="card-body">
+                <h3 class="text-primary mb-3">ZMW {{ product.price }}</h3>
+
+                <h5 class="mb-2">Description</h5>
+                <p>{{ product.description }}</p>
+
+                <div class="mb-3">
+                    <h5 class="mb-2">Category</h5>
+                    <span class="badge bg-secondary">{{ product.category.name }}</span>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="mb-2">Seller</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user text-primary"></i>
+                        </div>
+                        <span>{{ product.seller.get_full_name|default:product.seller.username }}</span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    {% if user.is_authenticated %} {% if user != product.seller %}
+                    <a href="{% url 'marketplace:add_to_cart' product.id %}" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                    </a>
+
+                    <i class="fas fa-comments me-2"></i> Contact Seller
+                    </a>
+                    {% else %}
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i> This is your product
+                    </div>
+                    <a href="{% url 'marketplace:edit_product' product.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i> Edit Product
+                    </a>
+                    <a href="{% url 'marketplace:delete_product' product.id %}" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i> Delete Product
+                    </a>
+                    {% endif %} {% else %}
+                    <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login to Purchase
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Location Map -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Product Location</h5>
+            </div>
+            <div class="card-body p-0">
+                <div id="map" style="height: 200px; width: 100%;">
+                    <!-- Map will be loaded here -->
+                    <div class="text-center p-4">
+                        <p class="text-muted">Location: {{ product.location }}</p>
+                        <p class="text-muted small">Map loading requires Google Maps API key</p>
+                        <a href="{% url 'marketplace:gps' %}" class="btn btn-primary">
+                            <i class="fas fa-map-marker-alt me-2"></i> Capture My Location
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Related Products -->
+<div class="mt-5">
+    <h3 class="mb-4">Related Products</h3>
+    <div class="row g-4">
+        {% for related_product in related_products %}
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm product-card">
+                <img src="{{ related_product.image.url }}" class="card-img-top" alt="{{ related_product.title }}" style="height: 150px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x150?text=Product+Image'">
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ related_product.title }}</h5>
+                    <p class="card-text text-truncate">{{ related_product.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-primary">ZMW {{ related_product.price }}</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a href="{% url 'marketplace:product_detail' related_product.id %}" class="btn btn-sm btn-primary w-100">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                No related products found.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .product-card:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+
+{% endblock %} {% block extra_js %}
+<script>
+    function initMap() {
+        var location = {
+            lat: {
+                {
+                    product.latitude
+                }
+            },
+            lng: {
+                {
+                    product.longitude
+                }
+            }
+        }; // Product location
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 15,
+            center: location
+        });
+        var marker = new google.maps.Marker({
+            position: location,
+            map: map
+        });
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" async defer></script>
+{% endblock %}

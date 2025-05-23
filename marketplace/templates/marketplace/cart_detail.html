@@ -1,0 +1,4 @@
+<form action="{% url 'empty_cart' %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Empty Cart</button>
+</form>

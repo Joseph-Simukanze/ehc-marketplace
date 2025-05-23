@@ -1,0 +1,131 @@
+{% extends 'base.html' %} {% block content %}
+<h1 class="mb-4">Checkout Process</h1>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Confirm Your Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="delivery_location" class="form-label">Delivery Location</label>
+                        <input type="text" name="delivery_location" id="delivery_location" class="form-control" value="{{ delivery_location }}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="delivery_option" class="form-label">Delivery Option</label>
+                        <input type="text" name="delivery_option" id="delivery_option" class="form-control" value="{{ delivery_option }}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label">Phone Number</label>
+                        <input type="text" name="phone_number" id="phone_number" class="form-control" value="{{ phone_number }}" readonly>
+                    </div>
+
+                    {% if delivery_option == 'inside' %}
+                    <div class="mb-3">
+                        <label for="hostel_name" class="form-label">Hostel Name</label>
+                        <input type="text" name="hostel_name" id="hostel_name" class="form-control" value="{{ hostel_name }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="room_number" class="form-label">Room Number</label>
+                        <input type="text" name="room_number" id="room_number" class="form-control" value="{{ room_number }}" readonly>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="is_student" class="form-label">Are you a student?</label>
+                        <input type="text" name="is_student" id="is_student" class="form-control" value="{{ is_student }}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="gps_location" class="form-label">GPS Location</label>
+                        <input type="text" name="gps_location" id="gps_location" class="form-control" value="{{ gps_location }}" readonly>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Proceed to Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Order Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>Items ({{ cart_items|length }})</h6>
+                    <ul class="list-group list-group-flush">
+                        {% for item in cart_items %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <span>{{ item.product.title|truncatechars:25 }}</span>
+                                <small class="text-muted d-block">Qty: {{ item.quantity }}</small>
+                            </div>
+                            <span>ZMW {{ item.product.price|floatformat:2|multiply:item.quantity }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <span>ZMW {{ subtotal|floatformat:2 }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Delivery Fee:</span>
+                    <span>ZMW {{ delivery_fee|floatformat:2 }}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between mb-3">
+                    <strong>Total:</strong>
+                    <strong>ZMW {{ total|floatformat:2 }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Here, you can add payment gateway integration like Stripe, PayPal, Airtel, MTN, etc.
+        // For example, you might call a function to initiate payment here based on the total amount.
+
+        // A simple function could be linked to a form submit or a button to process the payment
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Prepare the form data for payment processing
+            var paymentData = {
+                delivery_location: document.getElementById('delivery_location').value,
+                delivery_option: document.getElementById('delivery_option').value,
+                phone_number: document.getElementById('phone_number').value,
+                total: {
+                    {
+                        total | floatformat: 2
+                    }
+                },
+                gps_location: document.getElementById('gps_location').value
+            };
+
+            // Simulate a payment gateway call (replace with actual integration logic)
+            processPayment(paymentData);
+        });
+    });
+
+    function processPayment(paymentData) {
+        // Here, integrate with your chosen payment gateway (e.g., Stripe, PayPal, Airtel, MTN)
+        alert("Processing payment with the following data: " + JSON.stringify(paymentData));
+        // Proceed with actual payment gateway integration
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Selling Products</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- Link to your CSS if needed -->
+    <style>
+        .star-rating {
+            color: gold;
+            font-size: 1.5em;
+        }
+        
+        .product-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-card:hover {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .product-card h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .product-card p {
+            margin: 5px 0;
+        }
+        
+        .product-card a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        
+        .product-card a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Top Selling Products</h1>
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="product-card">
+                    <h2>{{ product.title }}</h2>
+                    <p><strong>Sold:</strong> {{ product.orders_count }} times</p>
+                    <p><strong>Price:</strong> ZMW {{ product.price }}</p>
+
+                    <!-- Display rating stars -->
+                    <p><strong>Rating:</strong> {% if product.average_rating %}
+                        <span class="star-rating">
+                                {% for i in product.get_rating_stars %}
+                                    ★
+                                {% endfor %}
+                            </span>
+                        <span>({{ product.average_rating|floatformat:1 }} / 5)</span> {% else %}
+                        <span>(No Ratings Yet)</span> {% endif %}
+                    </p>
+
+                    <p><a href="{% url 'marketplace:product_detail' product.id %}">View Product</a></p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    No top selling products found.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,328 @@
+{% extends 'base.html' %} {% block title %}My Products - EHC Marketplace{% endblock %} {% block content %}
+<div class="my-products-page">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'marketplace:home' %}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">My Products</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">My Products</h1>
+                    <p class="text-muted mb-0">Manage your product listings and inventory</p>
+                </div>
+                {% if user.is_subscription_active %}
+                <a href="{% url 'marketplace:add_product' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i> Add New Product
+                </a>
+                {% else %}
+                <a href="{% url 'accounts:subscribe' %}" class="btn btn-warning btn-lg">
+                    <i class="fas fa-crown me-2"></i> Subscribe to Sell
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if low_stock_products %}
+        <div class="alert alert-warning alert-dismissible fade show">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
+                <div>
+                    <h5 class="alert-heading mb-2">Low Stock Alert!</h5>
+                    <ul class="mb-0">
+                        {% for product in low_stock_products %}
+                        <li>{{ product.title }} - Only {{ product.stock }} remaining</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <div class="dashboard-cards mb-4">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card stat-card h-100">
+                        <div class="card-body text-center">
+                            <div class="stat-icon bg-primary-light text-primary">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <h3 class="mt-3 mb-1">{{ products.paginator.count }}</h3>
+                            <p class="text-muted mb-0">Total Products</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card h-100">
+                        <div class="card-body text-center">
+                            <div class="stat-icon bg-success-light text-success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 class="mt-3 mb-1">{{ available_count }}</h3>
+                            <p class="text-muted mb-0">Available</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card h-100">
+                        <div class="card-body text-center">
+                            <div class="stat-icon bg-info-light text-info">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <h3 class="mt-3 mb-1">{{ order_count }}</h3>
+                            <p class="text-muted mb-0">Orders</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card h-100">
+                        <div class="card-body text-center">
+                            <div class="stat-icon bg-warning-light text-warning">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <h3 class="mt-3 mb-1">ZMW {{ total_revenue|floatformat:2 }}</h3>
+                            <p class="text-muted mb-0">Revenue</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="products-table">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">My Product Listings</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-filter me-1"></i> Filter
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                                <li><a class="dropdown-item" href="?status=all">All Products</a></li>
+                                <li><a class="dropdown-item" href="?status=available">Available Only</a></li>
+                                <li><a class="dropdown-item" href="?status=out_of_stock">Out of Stock</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 80px;">Image</th>
+                                    <th>Product</th>
+                                    <th style="width: 120px;">Price</th>
+                                    <th style="width: 150px;">Category</th>
+                                    <th style="width: 120px;">Status</th>
+                                    <th style="width: 120px;">Date Posted</th>
+                                    <th style="width: 140px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ product.image.url }}" alt="{{ product.title }}" class="rounded" style="width: 60px; height: 60px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/60x60?text=No+Image';">
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'marketplace:product_detail' product.id %}" class="text-dark fw-semibold">{{ product.title }}</a>
+                                    </td>
+                                    <td class="fw-bold">ZMW {{ product.price }}</td>
+                                    <td><span class="badge bg-light text-dark">{{ product.category.name }}</span></td>
+                                    <td>
+                                        <span class="badge {% if product.is_available %}bg-success-light text-success{% else %}bg-danger-light text-danger{% endif %}">
+                                            <i class="fas fa-circle me-1" style="font-size: 6px; vertical-align: middle;"></i>
+                                            {{ product.is_available|yesno:"Available,Unavailable" }}
+                                        </span>
+                                    </td>
+                                    <td class="text-muted">{{ product.date_posted|date:"M d, Y" }}</td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="{% url 'marketplace:product_detail' product.id %}" class="btn btn-sm btn-outline-primary" title="View" data-bs-toggle="tooltip">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'marketplace:edit_product' product.id %}" class="btn btn-sm btn-outline-secondary" title="Edit" data-bs-toggle="tooltip">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'marketplace:delete_product' product.id %}" class="btn btn-sm btn-outline-danger" title="Delete" data-bs-toggle="tooltip">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5">
+                                        <div class="py-4">
+                                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                            <h5 class="mb-3">No Products Found</h5>
+                                            <p class="text-muted mb-4">You haven't added any products to your store yet.</p>
+                                            {% if user.is_subscription_active %}
+                                            <a href="{% url 'marketplace:add_product' %}" class="btn btn-primary">
+                                                <i class="fas fa-plus me-2"></i> Add Your First Product
+                                            </a>
+                                            {% else %}
+                                            <a href="{% url 'accounts:subscribe' %}" class="btn btn-warning">
+                                                <i class="fas fa-crown me-2"></i> Subscribe to Start Selling
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% if products.paginator.num_pages > 1 %}
+                <div class="card-footer bg-white border-top-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted">
+                            Showing <span class="fw-semibold">{{ products.start_index }}-{{ products.end_index }}</span> of <span class="fw-semibold">{{ products.paginator.count }}</span> products
+                        </div>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination pagination-sm mb-0">
+                                {% if products.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ products.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %} {% for num in products.paginator.page_range %} {% if products.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                                {% elif num > products.number|add:'-3' and num
+                                < products.number|add: '3' %} <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a></li>
+                                    {% endif %} {% endfor %} {% if products.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ products.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ products.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Last">
+                                            <span aria-hidden="true">&raquo;&raquo;</span>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                            <span aria-hidden="true">&raquo;&raquo;</span>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .my-products-page {
+        background-color: #f8f9fa;
+        min-height: calc(100vh - 56px);
+        padding-bottom: 2rem;
+    }
+    
+    .page-header {
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .stat-card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 24px;
+    }
+    
+    .bg-primary-light {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    
+    .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+    
+    .bg-info-light {
+        background-color: rgba(13, 202, 240, 0.1);
+    }
+    
+    .bg-warning-light {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+    
+    .bg-danger-light {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+    
+    .products-table .table {
+        margin-bottom: 0;
+    }
+    
+    .products-table .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+    }
+    
+    .products-table .table td,
+    .products-table .table th {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    
+    .products-table .table tr:last-child td {
+        border-bottom: 0;
+    }
+</style>
+
+{% endblock %}

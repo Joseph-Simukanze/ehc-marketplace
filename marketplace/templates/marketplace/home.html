@@ -1,0 +1,726 @@
+{% extends 'base.html' %} {% load marketplace_filters %}{% block title %}EHC Marketplace - Buy and Sell at Evelynhone College{% endblock %} {% block content %}
+<!-- Hero Section -->
+<section class="hero bg-gradient-primary text-white rounded-3 p-5 mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-3">
+                <span id="typing-text"></span>
+            </h1>
+            <p class="lead mb-4 fs-4">
+                Discover the ultimate student marketplace at Evelynhone College. Buy, sell, and connect with ease—find amazing deals or list your items securely.
+            </p>
+            <div class="d-grid gap-3 d-md-flex">
+                <a href="{% url 'marketplace:product_list' %}" class="btn btn-light btn-lg px-4 btn-hover text-primary">Shop Now</a> {% if user.is_authenticated %} {% if user.is_subscription_active %}
+                <a href="{% url 'marketplace:add_product' %}" class="btn btn-outline-light btn-lg px-4 btn-hover">Sell an Item</a> {% else %}
+                <a href="{% url 'accounts:subscribe' %}" class="btn btn-outline-light btn-lg px-4 btn-hover">Subscribe to Sell</a> {% endif %} {% else %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg px-4 btn-hover">Join Now</a> {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-6 mt-4 mt-lg-0 text-center">
+            <!-- <img src="" alt="EHC Marketplace" class="img-fluid rounded shadow-lg img-hover" style="max-height: 400px; object-fit: contain;" onerror="this.src='https://via.placeholder.com/600x400?text=EHC+Marketplace'">  -->
+        </div>
+    </div>
+</section>
+
+<!-- Slideshow Section -->
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fs-2 mb-0 text-dark">Hot Deals</h2>
+        <button id="playPauseBtn" class="btn btn-outline-primary btn-hover" onclick="toggleCarousel()">
+            <i id="playPauseIcon" class="fas fa-pause"></i>
+        </button>
+    </div>
+    <div id="carouselOffers" class="carousel slide shadow-sm rounded" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active" data-offer-id="offer1">
+                <img src="static/images/pexels-atomlaborblog-844923.jpg" class="d-block w-100" style="max-height: 400px; object-fit: cover;" alt="Electronics Deal">
+                <div class="carousel-caption d-block caption-hover">
+                    <h5>Up to 25% Off Electronics</h5>
+                    <p>Shop the latest gadgets at unbeatable prices!</p>
+                    <a href="{% url 'marketplace:product_list' %}?category=electronics" class="btn btn-sm btn-primary btn-hover">Shop Now</a> {% if user.is_authenticated %}
+                    <button class="btn btn-sm btn-outline-danger unlike-btn" data-offer-id="offer1" title="Unlike this offer">
+                            <i class="fas fa-thumbs-down"></i>
+                        </button>
+                    <button class="btn btn-sm btn-outline-primary like-btn" data-offer-id="offer1" title="Like this offer">
+                            <i class="far fa-heart"></i>
+                        </button> {% endif %}
+                </div>
+            </div>
+            <div class="carousel-item" data-offer-id="offer2">
+                <img src="static/images/pexels-funandthames-332826.jpg" class="d-block w-100" style="max-height: 400px; object-fit: cover;" alt="Books Deal">
+                <div class="carousel-caption d-block caption-hover">
+                    <h5>Buy 1, Get 1 Free on Books</h5>
+                    <p>Stock up on textbooks and novels today!</p>
+                    <a href="{% url 'marketplace:product_list' %}?category=books" class="btn btn-sm btn-primary btn-hover">Shop Now</a> {% if user.is_authenticated %}
+                    <button class="btn btn-sm btn-outline-danger unlike-btn" data-offer-id="offer2" title="Unlike this offer">
+                            <i class="fas fa-thumbs-down"></i>
+                        </button>
+                    <button class="btn btn-sm btn-outline-primary like-btn" data-offer-id="offer2" title="Like this offer">
+                            <i class="far fa-heart"></i>
+                        </button> {% endif %}
+                </div>
+            </div>
+            <div class="carousel-item" data-offer-id="offer4">
+                <img src="static/images/pexels-bibesh-manandhar-820220-13470684.jpg" class="d-block w-100" style="max-height: 450px; object-fit: cover;" alt="Clothing Deal">
+                <div class="carousel-caption d-block caption-hover">
+                    <h5>50% Off All Clothing</h5>
+                    <p>Refresh your style with huge savings!</p>
+                    <a href="{% url 'marketplace:product_list' %}?category=clothing" class="btn btn-sm btn-primary btn-hover">Shop Now</a> {% if user.is_authenticated %}
+                    <button class="btn btn-sm btn-outline-danger unlike-btn" data-offer-id="offer4" title="Unlike this offer">
+                            <i class="fas fa-thumbs-down"></i>
+                        </button>
+                    <button class="btn btn-sm btn-outline-primary like-btn" data-offer-id="offer4" title="Like this offer">
+                            <i class="far fa-heart"></i>
+                        </button> {% endif %}
+                </div>
+            </div>
+            <div class="carousel-item" data-offer-id="offer4">
+                <img src="static/images/pexels-deni-priyo-3550015-12089509.jpg" class="d-block w-100" style="max-height: 450px; object-fit: cover;" alt="Clothing Deal">
+                <div class="carousel-caption d-block caption-hover">
+                    <h5>50% Off All Clothing</h5>
+                    <p>Refresh your style with huge savings!</p>
+                    <a href="{% url 'marketplace:product_list' %}?category=clothing" class="btn btn-sm btn-primary btn-hover">Shop Now</a> {% if user.is_authenticated %}
+                    <button class="btn btn-sm btn-outline-danger unlike-btn" data-offer-id="offer4" title="Unlike this offer">
+                            <i class="fas fa-thumbs-down"></i>
+                        </button>
+                    <button class="btn btn-sm btn-outline-primary like-btn" data-offer-id="offer4" title="Like this offer">
+                            <i class="far fa-heart"></i>
+                        </button> {% endif %}
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselOffers" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselOffers" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</section>
+
+<!-- Featured Categories Section -->
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fs-2 mb-0 text-dark">Browse Categories</h2>
+        <a href="{% url 'marketplace:product_list' %}" class="btn btn-sm btn-outline-primary btn-hover">View All</a>
+    </div>
+    <div class="row g-4">
+        {% for category in categories %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="{% url 'marketplace:product_list' %}?category={{ category.id }}" class="text-decoration-none">
+                <div class="card h-100 border-0 shadow-sm category-card">
+                    <div class="card-body text-center">
+                        {% if category.name == "Electronics" %}
+                        <i class="fas fa-laptop fa-2x text-primary mb-3"></i> {% elif category.name == "Books" %}
+                        <i class="fas fa-book fa-2x text-primary mb-3"></i> {% elif category.name == "Clothing" %}
+                        <i class="fas fa-tshirt fa-2x text-primary mb-3"></i> {% elif category.name == "Furniture" %}
+                        <i class="fas fa-chair fa-2x text-primary mb-3"></i> {% elif category.name == "Sports" %}
+                        <i class="fas fa-basketball-ball fa-2x text-primary mb-3"></i> {% elif category.name == "School" %}
+                        <i class="fas fa-school fa-2x text-primary mb-3"></i> {% elif category.name == "Shoes" %}
+                        <i class="fas fa-shoe-prints fa-2x text-primary mb-3"></i> {% elif category.name == "Phones" %}
+                        <i class="fas fa-mobile-alt fa-2x text-primary mb-3"></i> {% elif category.name == "Accessories" %}
+                        <i class="fas fa-gem fa-2x text-primary mb-3"></i> {% elif category.name == "Beauty" %}
+                        <i class="fas fa-magic fa-2x text-primary mb-3"></i> {% elif category.name == "Toys" %}
+                        <i class="fas fa-puzzle-piece fa-2x text-primary mb-3"></i> {% elif category.name == "Groceries" %}
+                        <i class="fas fa-apple-alt fa-2x text-primary mb-3"></i> {% elif category.name == "Music" %}
+                        <i class="fas fa-music fa-2x text-primary mb-3"></i> {% elif category.name == "Home Appliances" %}
+                        <i class="fas fa-blender fa-2x text-primary mb-3"></i> {% elif category.name == "Beers" %}
+                        <i class="fas fa-beer fa-2x text-primary mb-3"></i> {% else %}
+                        <i class="fas fa-shopping-bag fa-2x text-primary mb-3"></i> {% endif %}
+                        <h5 class="card-title fw-bold">{{ category.name }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                No categories available yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fs-2 mb-0 text-dark">Featured Products</h2>
+        <a href="{% url 'marketplace:product_list' %}" class="btn btn-sm btn-outline-primary btn-hover">View All Products</a>
+    </div>
+    <div class="row g-4">
+        {% for product in products %}
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm product-card">
+                <img src="{{ product.image.url }}" class="card-img-top img-hover" alt="{{ product.title }}" style="height: 200px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'">
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ product.title }}</h5>
+                    <p class="card-text text-muted small mb-2">{{ product.category.name }}</p>
+                    <p class="card-text text-truncate">{{ product.description }}</p>
+                    <!-- Assume product.rating is a float from 0 to 5 -->
+                    <!-- Font Awesome CSS -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+                    <div class="product-rating" data-product-id="{{ product.id }}">
+                        {% for i in "12345"|make_list %} {% with forloop.counter as star %}
+                        <i class="fa-star fa {% if star <= product.rating_int %}fas{% else %}far{% endif %} text-warning rating-star" data-value="{{ star }}"></i> {% endwith %} {% endfor %}
+                        <span class="rating-count">({{ product.num_ratings }})</span>
+                    </div>
+
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-primary">ZMW {{ product.price }}</span>
+                        <small class="text-muted">{{ product.date_posted|timesince }} ago</small>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                    <a href="{% url 'marketplace:product_detail' product.id %}" class="btn btn-sm btn-primary btn-hover">View Details</a> {% if user.is_authenticated %}
+                    <a href="{% url 'marketplace:add_to_cart' product.id %}" class="btn btn-primary btn-hover">
+                        <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                No products available yet. Be the first to add a product!
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="mb-5">
+    <h2 class="fs-2 mb-4 text-center text-dark">How EHC Marketplace Works</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center p-3 how-it-works-card">
+                <div class="card-body">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-user-plus fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">1. Create an Account</h5>
+                    <p class="card-text">Join with your student details to unlock full marketplace access.</p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-primary btn-hover">Register Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center p-3 how-it-works-card">
+                <div class="card-body">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-hand-holding-usd fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">2. Subscribe to Sell</h5>
+                    <p class="card-text">Unlock selling with a simple monthly subscription.</p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{% url 'accounts:subscribe' %}" class="btn btn-outline-primary btn-hover">Subscribe</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center p-3 how-it-works-card">
+                <div class="card-body">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-exchange-alt fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">3. Buy & Sell</h5>
+                    <p class="card-text">Trade securely with integrated payments and messaging.</p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{% url 'marketplace:product_list' %}" class="btn btn-outline-primary btn-hover">Explore Products</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="mb-5">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h2 class="fs-2 mb-4 text-center text-dark">Why Choose EHC Marketplace?</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3 benefit-item">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-shield-alt text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h5>Secure Transactions</h5>
+                            <p class="text-muted">Safe payments with MTN and Airtel mobile money.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 benefit-item">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-map-marker-alt text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h5>Location Services</h5>
+                            <p class="text-muted">Track deliveries with affordable fees.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 benefit-item">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-users text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h5>Student Community</h5>
+                            <p class="text-muted">Connect and trade with fellow students.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 benefit-item">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-gift text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <h5>Exclusive Deals</h5>
+                            <p class="text-muted">Access limited-time offers and discounts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Self-typing effect for the welcome text
+    document.addEventListener('DOMContentLoaded', function() {
+        const text = "Welcome to EHC Marketplace";
+        const typingElement = document.getElementById('typing-text');
+        let index = 0;
+
+        function type() {
+            if (index < text.length) {
+                typingElement.textContent += text.charAt(index);
+                index++;
+                setTimeout(type, 80);
+            } else {
+                typingElement.innerHTML += '<span class="cursor">|</span>';
+                setTimeout(() => {
+                    typingElement.textContent = '';
+                    index = 0;
+                    const cursor = typingElement.querySelector('.cursor');
+                    if (cursor) cursor.remove();
+                    type();
+                }, 2500);
+            }
+        }
+        type();
+    });
+
+    // Toggle carousel play/pause
+    function toggleCarousel() {
+        const carousel = document.querySelector('#carouselOffers');
+        const playPauseBtn = document.querySelector('#playPauseBtn');
+        const playPauseIcon = document.querySelector('#playPauseIcon');
+
+        if (carousel.classList.contains('carousel-paused')) {
+            carousel.classList.remove('carousel-paused');
+            playPauseIcon.classList.remove('fa-play');
+            playPauseIcon.classList.add('fa-pause');
+            carousel.setAttribute('data-bs-ride', 'carousel');
+            bootstrap.Carousel.getOrCreateInstance(carousel).cycle();
+        } else {
+            carousel.classList.add('carousel-paused');
+            playPauseIcon.classList.remove('fa-pause');
+            playPauseIcon.classList.add('fa-play');
+            bootstrap.Carousel.getOrCreateInstance(carousel).pause();
+        }
+    }
+
+    // Like and Unlike functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.querySelector('#carouselOffers');
+        const carouselInstance = bootstrap.Carousel.getOrCreateInstance(carousel);
+        const items = document.querySelectorAll('.carousel-item');
+        let unlikedOffers = JSON.parse(localStorage.getItem('unlikedOffers') || '[]');
+        let likedOffers = JSON.parse(localStorage.getItem('likedOffers') || '[]');
+
+        items.forEach(item => {
+            const offerId = item.getAttribute('data-offer-id');
+            const likeBtn = item.querySelector('.like-btn');
+            if (unlikedOffers.includes(offerId)) {
+                item.style.display = 'none';
+            }
+            if (likedOffers.includes(offerId) && likeBtn) {
+                likeBtn.querySelector('i').classList.remove('far', 'fa-heart');
+                likeBtn.querySelector('i').classList.add('fas', 'fa-heart');
+                likeBtn.classList.remove('btn-outline-primary');
+                likeBtn.classList.add('btn-primary');
+                item.style.display = '';
+                unlikedOffers = unlikedOffers.filter(id => id !== offerId);
+            }
+        });
+        localStorage.setItem('unlikedOffers', JSON.stringify(unlikedOffers));
+
+        let visibleItems = Array.from(items).filter(item => item.style.display !== 'none');
+        if (visibleItems.length === 0) {
+            localStorage.setItem('unlikedOffers', '[]');
+            items.forEach(item => item.style.display = '');
+            unlikedOffers = [];
+            visibleItems = Array.from(items);
+        }
+        if (!visibleItems.some(item => item.classList.contains('active'))) {
+            visibleItems[0].classList.add('active');
+            carouselInstance.to(0);
+        }
+
+        document.querySelectorAll('.unlike-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const offerId = this.getAttribute('data-offer-id');
+                const item = document.querySelector(`.carousel-item[data-offer-id="${offerId}"]`);
+                const likeBtn = item.querySelector('.like-btn');
+
+                item.style.display = 'none';
+                unlikedOffers.push(offerId);
+                unlikedOffers = [...new Set(unlikedOffers)];
+                localStorage.setItem('unlikedOffers', JSON.stringify(unlikedOffers));
+
+                if (likedOffers.includes(offerId)) {
+                    likedOffers = likedOffers.filter(id => id !== offerId);
+                    localStorage.setItem('likedOffers', JSON.stringify(likedOffers));
+                    if (likeBtn) {
+                        likeBtn.querySelector('i').classList.remove('fas', 'fa-heart');
+                        likeBtn.querySelector('i').classList.add('far', 'fa-heart');
+                        likeBtn.classList.remove('btn-primary');
+                        likeBtn.classList.add('btn-outline-primary');
+                    }
+                }
+
+                const newVisibleItems = Array.from(items).filter(item => item.style.display !== 'none');
+                if (newVisibleItems.length === 0) {
+                    localStorage.setItem('unlikedOffers', '[]');
+                    items.forEach(item => item.style.display = '');
+                    unlikedOffers = [];
+                    newVisibleItems.push(...items);
+                }
+
+                if (!newVisibleItems.some(item => item.classList.contains('active'))) {
+                    newVisibleItems[0].classList.add('active');
+                    carouselInstance.to(Array.from(items).indexOf(newVisibleItems[0]));
+                }
+
+                if (!carousel.classList.contains('carousel-paused')) {
+                    carouselInstance.cycle();
+                }
+            });
+        });
+
+        document.querySelectorAll('.like-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const offerId = this.getAttribute('data-offer-id');
+                const item = document.querySelector(`.carousel-item[data-offer-id="${offerId}"]`);
+                const icon = this.querySelector('i');
+
+                if (likedOffers.includes(offerId)) {
+                    likedOffers = likedOffers.filter(id => id !== offerId);
+                    icon.classList.remove('fas', 'fa-heart');
+                    icon.classList.add('far', 'fa-heart');
+                    this.classList.remove('btn-primary');
+                    this.classList.add('btn-outline-primary');
+                } else {
+                    likedOffers.push(offerId);
+                    likedOffers = [...new Set(likedOffers)];
+                    icon.classList.remove('far', 'fa-heart');
+                    icon.classList.add('fas', 'fa-heart');
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-primary');
+                    item.style.display = '';
+                    unlikedOffers = unlikedOffers.filter(id => id !== offerId);
+                    localStorage.setItem('unlikedOffers', JSON.stringify(unlikedOffers));
+                }
+
+                localStorage.setItem('likedOffers', JSON.stringify(likedOffers));
+
+                const newVisibleItems = Array.from(items).filter(item => item.style.display !== 'none');
+                if (!newVisibleItems.some(item => item.classList.contains('active'))) {
+                    newVisibleItems[0].classList.add('active');
+                    carouselInstance.to(Array.from(items).indexOf(newVisibleItems[0]));
+                }
+
+                if (!carousel.classList.contains('carousel-paused')) {
+                    carouselInstance.cycle();
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    /* CSS Variables for consistent theming */
+    
+     :root {
+        --primary-color: #007bff;
+        --primary-hover: #0056b3;
+        --secondary-color: #6c757d;
+        --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
+        --transition: all 0.3s ease;
+        --border-radius: 12px;
+    }
+    /* Gradient Background for Hero */
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #00aaff 100%);
+    }
+    /* Hero Section */
+    
+    .hero {
+        box-shadow: var(--shadow-light);
+        overflow: hidden;
+    }
+    
+    .hero h1,
+    .hero p {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    /* Button Styles */
+    
+    .btn-hover {
+        transition: var(--transition);
+    }
+    
+    .btn-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-light);
+    }
+    
+    .btn-primary.btn-hover:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+    }
+    
+    .btn-outline-primary.btn-hover:hover,
+    .btn-outline-light.btn-hover:hover {
+        background-color: var(--primary-color);
+        color: #fff;
+        border-color: var(--primary-color);
+    }
+    /* Carousel Styles */
+    
+    .carousel {
+        border-radius: var(--border-radius);
+    }
+    
+    .carousel-item img {
+        border-radius: var(--border-radius);
+        transition: transform 0.5s ease;
+    }
+    
+    .carousel-item.active img {
+        transform: scale(1.02);
+    }
+    
+    .carousel-caption {
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 8px;
+        padding: 15px;
+        transform: translateY(10px);
+        transition: var(--transition);
+    }
+    
+    .carousel-caption:hover {
+        background: rgba(0, 0, 0, 0.75);
+        transform: translateY(5px);
+    }
+    
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+        background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+        background: rgba(0, 0, 0, 0.5);
+    }
+    /* Category Card Styles */
+    
+    .category-card {
+        background: #fff;
+        border-radius: var(--border-radius);
+        border: 1px solid #e9ecef;
+        padding: 20px;
+        height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+    }
+    
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+        border-color: var(--primary-color);
+    }
+    
+    .category-card i {
+        transition: var(--transition);
+    }
+    
+    .category-card:hover i {
+        color: var(--primary-hover);
+        transform: scale(1.15);
+    }
+    
+    .category-card .card-title {
+        font-size: 1rem;
+        color: #333;
+        margin: 0;
+        transition: var(--transition);
+    }
+    
+    .category-card:hover .card-title {
+        color: var(--primary-color);
+    }
+    /* Product Card Styles */
+    
+    .product-card {
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+    }
+    
+    .product-card .card-img-top {
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+    }
+    
+    .product-card:hover .card-title {
+        color: var(--primary-color);
+    }
+    /* How It Works Card Styles */
+    
+    .how-it-works-card {
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+    
+    .how-it-works-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+        background-color: #f8f9fa;
+    }
+    
+    .how-it-works-card .card-title {
+        transition: var(--transition);
+    }
+    
+    .how-it-works-card:hover .card-title {
+        color: var(--primary-color);
+    }
+    /* Benefits Section */
+    
+    .benefit-item {
+        transition: var(--transition);
+    }
+    
+    .benefit-item:hover {
+        transform: translateY(-3px);
+    }
+    
+    .benefit-item:hover h5 {
+        color: var(--primary-color);
+    }
+    /* Like/Unlike Buttons */
+    
+    .unlike-btn,
+    .like-btn {
+        margin-left: 10px;
+        transition: var(--transition);
+    }
+    
+    .unlike-btn:hover {
+        background-color: #dc3545;
+        color: #fff;
+        border-color: #dc3545;
+    }
+    
+    .like-btn:hover {
+        background-color: var(--primary-color);
+        color: #fff;
+        border-color: var(--primary-color);
+    }
+    
+    .like-btn.btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+    }
+    /* Typing Animation */
+    
+    #typing-text {
+        display: inline-block;
+        white-space: nowrap;
+    }
+    
+    .cursor {
+        display: inline-block;
+        animation: blink 0.5s step-end infinite;
+    }
+    
+    @keyframes blink {
+        50% {
+            opacity: 0;
+        }
+    }
+    /* Responsive Adjustments */
+    
+    @media (max-width: 768px) {
+        .hero {
+            padding: 3rem 2rem;
+        }
+        .category-card {
+            height: 140px;
+        }
+        .category-card i {
+            font-size: 1.5rem;
+        }
+        .category-card .card-title {
+            font-size: 0.9rem;
+        }
+        .carousel-caption {
+            padding: 10px;
+        }
+        .carousel-caption h5 {
+            font-size: 1rem;
+        }
+        .carousel-caption p {
+            font-size: 0.85rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .hero h1 {
+            font-size: 2.5rem;
+        }
+        .hero p {
+            font-size: 1rem;
+        }
+        .category-card {
+            height: 120px;
+        }
+        .category-card i {
+            font-size: 1.25rem;
+        }
+        .category-card .card-title {
+            font-size: 0.85rem;
+        }
+        .carousel-item img {
+            max-height: 300px;
+        }
+    }
+</style>
+{% endblock %}

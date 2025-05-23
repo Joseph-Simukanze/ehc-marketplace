@@ -1,0 +1,302 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container py-5">
+    <!-- Hero Section -->
+    <section class="text-center mb-5 py-5 bg-gradient-primary text-white rounded-4 shadow-sm">
+        <div class="container py-4">
+            <h1 class="display-4 fw-bold mb-3">About EHC Marketplace</h1>
+            <p class="lead mb-4">Empowering Evelynhone College students with a trusted marketplace for all their needs</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="#our-story" class="btn btn-light btn-lg px-4 rounded-pill">
+                    <i class="fas fa-book-open me-2"></i> Our Story
+                </a>
+                <a href="#our-team" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+                    <i class="fas fa-users me-2"></i> Meet the Team
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Story Section -->
+    <section id="our-story" class="row align-items-center g-5 mb-5 py-4">
+        <div class="col-lg-6">
+            <div class="position-relative">
+                <img src="/static/images/team.jpg" class="img-fluid" alt="EHC Marketplace Team">
+                <div class="position-absolute top-0 start-0 translate-middle">
+                    <span class="badge bg-white text-primary p-3 rounded-3 shadow">
+                        <i class="fas fa-calendar-alt fa-2x"></i>
+                        <span class="ms-2 fw-bold">Est. 2025</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h2 class="fw-bold mb-4 display-5">Our Story</h2>
+            <p class="lead text-muted mb-4">Born from a student project at Evelynhone College, EHC Marketplace has grown into the premier platform connecting students across campus. What started as a simple idea to help classmates buy and sell textbooks has blossomed into a vibrant
+                community marketplace.</p>
+
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 me-3">
+                    <i class="fas fa-bullseye fa-2x"></i>
+                </div>
+                <div>
+                    <h3 class="h4 fw-semibold mb-1">Our Mission</h3>
+                    <p class="mb-0 text-muted">To create a secure, student-friendly marketplace that makes campus life more affordable and convenient.</p>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-3 mb-4">
+                <span class="badge bg-primary bg-opacity-10 text-primary p-3 rounded-pill border border-primary">
+                    <i class="fas fa-check-circle me-2"></i> 100% Student-Run
+                </span>
+                <span class="badge bg-primary bg-opacity-10 text-primary p-3 rounded-pill border border-primary">
+                    <i class="fas fa-check-circle me-2"></i> Secure Payments
+                </span>
+                <span class="badge bg-primary bg-opacity-10 text-primary p-3 rounded-pill border border-primary">
+                    <i class="fas fa-check-circle me-2"></i> Campus Delivery
+                </span>
+            </div>
+
+            <a href="{% url 'marketplace:contact' %}" class="btn btn-primary btn-lg px-4 rounded-pill">
+                <i class="fas fa-envelope me-2"></i> Contact Us
+            </a>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="my-5 py-4 bg-light rounded-4">
+        <div class="container">
+            <div class="row g-4 text-center">
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <h2 class="display-4 fw-bold text-primary">500+</h2>
+                        <p class="text-muted mb-0">Active Users</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <h2 class="display-4 fw-bold text-primary">1K+</h2>
+                        <p class="text-muted mb-0">Products Listed</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <h2 class="display-4 fw-bold text-primary">98%</h2>
+                        <p class="text-muted mb-0">Positive Reviews</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <h2 class="display-4 fw-bold text-primary">24/7</h2>
+                        <p class="text-muted mb-0">Support Available</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="our-team" class="my-5 py-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-5 mb-3">Meet Our Team</h2>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                The passionate students behind EHC Marketplace who work tirelessly to improve your experience
+            </p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Team Member 1 -->
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm overflow-hidden text-center team-card">
+                    <div class="team-img-container">
+                        <img src="/static/images/WhatsApp Image 2025-04-11 at 21.12.01_72c49710.jpg" class="img-fluid" alt="CEO">
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-semibold mb-1">Joseph Simukanze</h5>
+                        <p class="text-primary mb-3">CEO & Founder</p>
+                        <p class="card-text text-muted small">Computer Science student who envisioned a better way for students to trade goods on campus.</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#" class="text-primary"><i class="fab fa-linkedin fa-lg"></i></a>
+                            <a href="#" class="text-primary"><i class="fab fa-twitter fa-lg"></i></a>
+                            <a href="#" class="text-primary"><i class="fas fa-envelope fa-lg"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 2 -->
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm overflow-hidden text-center team-card">
+                    <div class="team-img-container">
+                        <img src="/static/images/WhatsApp Image 2025-04-11 at 21.12.01_72c49710.jpg" class="img-fluid" alt="CTO">
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-semibold mb-1">Lillian Chanda</h5>
+                        <p class="text-primary mb-3">Chief Technology Officer</p>
+                        <p class="card-text text-muted small">Software Engineering student building the technical foundation of our platform.</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#" class="text-primary"><i class="fab fa-linkedin fa-lg"></i></a>
+                            <a href="#" class="text-primary"><i class="fab fa-github fa-lg"></i></a>
+                            <a href="#" class="text-primary"><i class="fas fa-envelope fa-lg"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 3 -->
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm overflow-hidden text-center team-card">
+                    <div class="team-img-container">
+                        <img src="/static/images/WhatsApp Image 2025-04-11 at 21.12.01_72c49710.jpg" class="img-fluid" alt="CMO">
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-semibold mb-1">Michael Zulu</h5>
+                        <p class="text-primary mb-3">Chief Marketing Officer</p>
+                        <p class="card-text text-muted small">Business student connecting our platform with the student community.</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#" class="text-primary"><i class="fab fa-instagram fa-lg"></i></a>
+                            <a href="#" class="text-primary"><i class="fab fa-twitter fa-lg"></i></a>
+                            <a href="#" class="text-primary"><i class="fas fa-envelope fa-lg"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="my-5 py-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-5 mb-3">Our Core Values</h2>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                The principles that guide everything we do at EHC Marketplace
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center value-card">
+                    <div class="icon-circle bg-primary bg-opacity-10 text-primary mx-auto mb-4">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-3">Community First</h5>
+                    <p class="text-muted">We prioritize building a supportive network where Evelynhone students can connect, trade, and help each other succeed.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center value-card">
+                    <div class="icon-circle bg-primary bg-opacity-10 text-primary mx-auto mb-4">
+                        <i class="fas fa-lock fa-2x"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-3">Trust & Safety</h5>
+                    <p class="text-muted">Secure MTN and Airtel mobile money payments with verified student accounts ensure peace of mind for all transactions.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center value-card">
+                    <div class="icon-circle bg-primary bg-opacity-10 text-primary mx-auto mb-4">
+                        <i class="fas fa-lightbulb fa-2x"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-3">Continuous Innovation</h5>
+                    <p class="text-muted">We're constantly improving our platform based on student feedback to enhance your buying and selling experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="my-5 py-5 bg-gradient-primary text-white rounded-4 shadow-sm">
+        <div class="container text-center py-4">
+            <h2 class="fw-bold display-5 mb-3">Ready to Join Our Community?</h2>
+            <p class="lead mb-4 mx-auto" style="max-width: 600px;">
+                Sign up today and start buying or selling with fellow Evelynhone College students
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-4 rounded-pill">
+                    <i class="fas fa-user-plus me-2"></i> Create Account
+                </a>
+                <a href="{% url 'marketplace:product_list' %}" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+                    <i class="fas fa-search me-2"></i> Browse Listings
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    /* Custom Styles */
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+    
+    .team-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .team-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .team-img-container {
+        height: 250px;
+        overflow: hidden;
+    }
+    
+    .team-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .team-card:hover .team-img-container img {
+        transform: scale(1.1);
+    }
+    
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .value-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .value-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+    
+    .badge {
+        transition: all 0.3s ease;
+    }
+    
+    .badge:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    @media (max-width: 768px) {
+        .display-5 {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+{% endblock %}

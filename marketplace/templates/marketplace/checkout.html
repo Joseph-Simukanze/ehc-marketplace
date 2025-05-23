@@ -1,0 +1,483 @@
+{% extends 'base.html' %} {% load marketplace_filters %} {% load crispy_forms_tags %} {% block content %}
+
+<div class="container py-5">
+    <h1 class="mb-4 fw-bold text-primary">Checkout</h1>
+
+    <div class="row g-4">
+        <!-- Delivery and Payment Form -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-truck me-2"></i>Delivery & Payment Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Unified form for delivery and payment -->
+                    <form method="post" action="{% url 'marketplace:process_checkout' %}" id="checkout-form" class="needs-validation" novalidate>
+                        {% csrf_token %} {{ form.non_field_errors }}
+
+                        <!-- Display form errors -->
+                        {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle me-2"></i> Please correct the following errors:
+                            </h5>
+                            <ul class="mb-0">
+                                <!-- Non-field errors (e.g., from clean() or form-wide validation) -->
+                                {% for error in form.non_field_errors %}
+                                <li><strong>Error:</strong> {{ error }}</li>
+                                {% endfor %}
+
+                                <!-- Field-specific errors -->
+                                {% for field in form %} {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                {% endfor %} {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+
+                        <!-- Delivery Location -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3 text-secondary"><i class="fas fa-map-marker-alt me-2"></i>Delivery Location</h6>
+                            <div class="card bg-light p-3 mb-3">
+                                <label class="form-label fw-bold" for="gps_location">GPS Location</label>
+                                <input type="hidden" name="gps_location" id="gps_location" aria-describedby="gps-help">
+                                <div id="gps-help" class="form-text text-muted">Click below to capture your GPS location on a map.</div>
+                                <a href="{% url 'marketplace:gps' %}" class="btn btn-outline-primary mt-2" target="_blank">
+                                    <i class="fas fa-map-marked-alt me-2"></i>Capture GPS Location
+                                </a>
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.delivery_location|as_crispy_field }}
+                                <div class="form-text text-muted">Please provide specific delivery instructions.</div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Option -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3 text-secondary"><i class="fas fa-route me-2"></i>Delivery Option</h6>
+                            <div class="card bg-light p-3">
+                                <label for="delivery_option" class="form-label fw-bold">Select Delivery Area</label>
+                                <select class="form-select form-select-lg" name="delivery_option" id="delivery_option" required aria-describedby="delivery-option-help">
+                                    <option value="" disabled selected>Choose delivery area...</option>
+                                    <option value="inside">Inside Campus</option>
+                                    <option value="outside">Outside Campus</option>
+                                </select>
+                                <div id="delivery-option-help" class="form-text text-muted">Choose whether you're inside or outside the campus.</div>
+                            </div>
+                        </div>
+
+                        <!-- Inside Campus Fields -->
+                        <div class="mb-4" id="inside-campus-fields" style="display: none;">
+                            <h6 class="fw-bold mb-3 text-secondary"><i class="fas fa-university me-2"></i>Inside Campus Details</h6>
+                            <div class="card bg-light p-3">
+                                <div class="form-floating mb-3">
+                                    <input type="text" name="hostel_name" id="hostel_name" class="form-control" placeholder="Hostel Name">
+                                    <label for="hostel_name">Hostel Name</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" name="room_number" id="room_number" class="form-control" placeholder="Room Number">
+                                    <label for="room_number">Room Number</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="tel" name="phone_number" id="phone_number_inside" class="form-control" placeholder="Phone Number" pattern="\+?[0-9]{10,15}">
+                                    <label for="phone_number_inside">Phone Number</label>
+                                    <div id="phone-help-inside" class="form-text text-muted">Enter a valid phone number (10-15 digits).</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="is_student" class="form-label fw-bold">Are you a student?</label>
+                                    <select class="form-select" name="is_student" id="is_student" aria-describedby="student-help" required>
+                                        <option value="" disabled selected>Select an option...</option>
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                    <div id="student-help" class="form-text text-muted">Select if you are a student.</div>
+                                    <div id="is-student-error" class="invalid-feedback" style="display: none;">
+                                        Sorry, only students are eligible to purchase this product.
+                                    </div>
+                                </div>
+
+                                <!-- Student Details for Inside Campus -->
+                                <div id="student-details-inside" style="display: none;">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" name="student_number" id="student_number_inside" class="form-control" placeholder="Student Number">
+                                        <label for="student_number_inside">Student Number</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" name="program_of_study" id="program_of_study_inside" class="form-control" placeholder="Program of Study">
+                                        <label for="program_of_study_inside">Program of Study</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Outside Campus Fields -->
+                        <div class="mb-4" id="outside-campus-fields" style="display: none;">
+                            <h6 class="fw-bold mb-3 text-secondary"><i class="fas fa-home me-2"></i>Outside Campus Details</h6>
+                            <div class="card bg-light p-3">
+                                <div class="form-floating mb-3">
+                                    <input type="tel" name="phone_number" id="phone_number_outside" class="form-control" placeholder="Phone Number" pattern="\+?[0-9]{10,15}">
+                                    <label for="phone_number_outside">Phone Number</label>
+                                    <div id="phone-help-outside" class="form-text text-muted">Enter a valid phone number (10-15 digits).</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="is_student_outside" class="form-label fw-bold">Are you a student?</label>
+                                    <select class="form-select" name="is_student_outside" id="is_student_outside" aria-describedby="student-outside-help" required>
+                                        <option value="" disabled selected>Select an option...</option>
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                    <div id="student-outside-help" class="form-text text-muted">Select if you are a student.</div>
+                                    <div id="is-student-outside-error" class="invalid-feedback" style="display: none;">
+                                        Sorry, only students are eligible to purchase this product.
+                                    </div>
+                                </div>
+
+                                <!-- Student Details for Outside Campus -->
+                                <div id="student-details-outside" style="display: none;">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" name="student_number" id="student_number_outside" class="form-control" placeholder="Student Number">
+                                        <label for="student_number_outside">Student Number</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input type="text" name="program_of_study" id="program_of_study_outside" class="form-control" placeholder="Program of Study">
+                                        <label for="program_of_study_outside">Program of Study</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3 text-secondary"><i class="fas fa-credit-card me-2"></i>Payment Method</h6>
+                            <div class="card bg-light p-3">
+                                <label for="payment_method" class="form-label fw-bold">Select Payment Method</label>
+                                <select class="form-select form-select-lg" name="payment_method" id="payment_method" required aria-describedby="payment-method-help">
+                                    <option value="" disabled selected>Choose payment method...</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="payment_on_delivery">Payment on Delivery</option>
+                                    <option value="airtel_money">Airtel Money</option>
+                                    <option value="mtn_money">MTN Money</option>
+                                </select>
+                                <div id="payment-method-help" class="form-text text-muted">Choose your preferred payment method.</div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Method for Payment on Delivery -->
+                        <div id="delivery-method-section" style="display: none;" class="mb-4">
+                            <h6 class="fw-bold mb-3 text-secondary"><i class="fas fa-bicycle me-2"></i>Delivery Method</h6>
+                            <div class="card bg-light p-3">
+                                <label for="delivery_method" class="form-label fw-bold">Select Delivery Method</label>
+                                <select class="form-select form-select-lg" name="delivery_method" id="delivery_method" aria-describedby="delivery-method-help">
+                                    <option value="" disabled selected>🚚 Choose delivery method...</option>
+                                    <option value="bicycle">🚲 Bicycle (ZMW 20.00)</option>
+                                    <option value="motorbike">🏍️ Motorbike (ZMW 35.00)</option>
+                                    <option value="small_car">🚗 Small Car (ZMW 50.00)</option>
+                                </select>
+
+                                <!-- OR using Font Awesome icons (requires Font Awesome CSS) -->
+                                <!-- <select class="form-select form-select-lg" name="delivery_method" id="delivery_method" aria-describedby="delivery-method-help">
+                                    <option value="" disabled selected><i class="fas fa-truck me-2"></i>Choose delivery method...</option>
+                                    <option value="bicycle"><i class="fas fa-bicycle me-2"></i>Bicycle (ZMW 20.00)</option>
+                                    <option value="motorbike"><i class="fas fa-motorcycle me-2"></i>Motorbike (ZMW 35.00)</option>
+                                    <option value="small_car"><i class="fas fa-car me-2"></i>Small Car (ZMW 50.00)</option>
+                                </select> -->
+                                <div id="delivery-method-help" class="form-text text-muted">Select your preferred delivery method for Payment on Delivery.</div>
+                                <div id="delivery-method-error" class="invalid-feedback" style="display: none;">
+                                    Please select a delivery method.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Airtel Money Fields -->
+                        <div id="airtel-money-section" style="display: none;" class="mb-4">
+                            <div class="card bg-light p-3">
+                                <div class="form-floating">
+                                    <input type="tel" name="airtel_number" id="airtel_number" class="form-control" placeholder="Airtel Money Number" pattern="\+?[0-9]{10,15}">
+                                    <label for="airtel_number">Airtel Money Number</label>
+                                </div>
+                                <div id="airtel-help" class="form-text text-muted mt-2">Enter a valid Airtel Money number.</div>
+                            </div>
+                        </div>
+
+                        <!-- MTN Money Fields -->
+                        <div id="mtn-money-section" style="display: none;" class="mb-4">
+                            <div class="card bg-light p-3">
+                                <div class="form-floating">
+                                    <input type="tel" name="mtn_number" id="mtn_number" class="form-control" placeholder="MTN Money Number" pattern="\+?[0-9]{10,15}">
+                                    <label for="mtn_number">MTN Money Number</label>
+                                </div>
+                                <div id="mtn-help" class="form-text text-muted mt-2">Enter a valid MTN Money number.</div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">
+                                <i class="fas fa-lock me-2"></i>Complete Checkout
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Order Summary</h5>
+                </div>
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3">Items ({{ cart_items|length }})</h6>
+                    <ul class="list-group list-group-flush mb-4">
+                        {% for item in cart_items %}
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="rounded" width="50" height="50"> {% else %}
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-image text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ item.product.title|truncatechars:25 }}</div>
+                                    <small class="text-muted">Qty: {{ item.quantity }}</small>
+                                </div>
+                            </div>
+                            <span class="fw-bold">ZMW {{ item.product.price|floatformat:2|multiply:item.quantity }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="border-top pt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Subtotal:</span>
+                            <span class="fw-bold">ZMW {{ subtotal|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Delivery Fee:</span>
+                            <span class="fw-bold" id="delivery-fee">ZMW 0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-3 pt-2 fw-bold fs-5">
+                            <span>Total:</span>
+                            <span class="text-primary" id="total-amount">ZMW {{ subtotal|floatformat:2 }}</span>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'marketplace:cart' %}" class="btn btn-outline-secondary w-100 mt-4">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for dynamic field visibility, validation, and delivery fee calculation -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select DOM elements
+        const deliveryOptionSelect = document.getElementById('delivery_option');
+        const insideCampusFields = document.getElementById('inside-campus-fields');
+        const outsideCampusFields = document.getElementById('outside-campus-fields');
+        const isStudentSelect = document.getElementById('is_student');
+        const isStudentOutsideSelect = document.getElementById('is_student_outside');
+        const studentDetailsInside = document.getElementById('student-details-inside');
+        const studentDetailsOutside = document.getElementById('student-details-outside');
+        const paymentMethodSelect = document.getElementById('payment_method');
+        const deliveryMethodSelect = document.getElementById('delivery_method');
+        const deliveryMethodSection = document.getElementById('delivery-method-section');
+        const deliveryMethodError = document.getElementById('delivery-method-error');
+        const airtelMoneySection = document.getElementById('airtel-money-section');
+        const mtnMoneySection = document.getElementById('mtn-money-section');
+        const checkoutForm = document.getElementById('checkout-form');
+        const isStudentError = document.getElementById('is-student-error');
+        const isStudentOutsideError = document.getElementById('is-student-outside-error');
+        const deliveryFeeElement = document.getElementById('delivery-fee');
+        const totalAmountElement = document.getElementById('total-amount');
+
+        // Get subtotal from template (assumes subtotal is passed as a variable)
+        const subtotal = parseFloat('{{ subtotal|floatformat:2 }}');
+
+        // Delivery fee structure
+        const deliveryFees = {
+            bicycle: 20.00,
+            motorbike: 35.00,
+            small_car: 50.00
+        };
+
+        // Update delivery fee and total
+        function updateOrderSummary() {
+            let deliveryFeeAmount = 0.00;
+
+            if (deliveryOptionSelect.value === 'inside') {
+                deliveryFeeAmount = 0.00; // No fee for inside campus
+            } else if (paymentMethodSelect.value === 'payment_on_delivery' && deliveryMethodSelect.value) {
+                deliveryFeeAmount = deliveryFees[deliveryMethodSelect.value] || 0.00;
+            }
+
+            let total = subtotal + deliveryFeeAmount;
+
+            deliveryFeeElement.textContent = `ZMW ${deliveryFeeAmount.toFixed(2)}`;
+            totalAmountElement.textContent = `ZMW ${total.toFixed(2)}`;
+        }
+
+        // Toggle delivery fields based on delivery option
+        function toggleDeliveryFields() {
+            const isInside = deliveryOptionSelect.value === 'inside';
+            insideCampusFields.style.display = isInside ? 'block' : 'none';
+            outsideCampusFields.style.display = isInside ? 'none' : 'block';
+
+            // Reset required fields when switching
+            if (isInside) {
+                document.getElementById('phone_number_outside').required = false;
+                document.getElementById('phone_number_inside').required = true;
+            } else {
+                document.getElementById('phone_number_inside').required = false;
+                document.getElementById('phone_number_outside').required = true;
+            }
+
+            // Update delivery method visibility and order summary
+            togglePaymentFields();
+            updateOrderSummary();
+        }
+
+        // Toggle student fields for inside campus
+        function toggleStudentFieldsInside() {
+            const isStudent = isStudentSelect.value === 'yes';
+            studentDetailsInside.style.display = isStudent ? 'block' : 'none';
+            isStudentError.style.display = isStudentSelect.value === 'no' ? 'block' : 'none';
+            isStudentSelect.classList.toggle('is-invalid', isStudentSelect.value === 'no');
+        }
+
+        // Toggle student fields for outside campus
+        function toggleStudentFieldsOutside() {
+            const isStudent = isStudentOutsideSelect.value === 'yes';
+            studentDetailsOutside.style.display = isStudent ? 'block' : 'none';
+            isStudentOutsideError.style.display = isStudentOutsideSelect.value === 'no' ? 'block' : 'none';
+            isStudentOutsideSelect.classList.toggle('is-invalid', isStudentOutsideSelect.value === 'no');
+        }
+
+        // Toggle payment and delivery method fields
+        function togglePaymentFields() {
+            airtelMoneySection.style.display = paymentMethodSelect.value === 'airtel_money' ? 'block' : 'none';
+            mtnMoneySection.style.display = paymentMethodSelect.value === 'mtn_money' ? 'block' : 'none';
+            deliveryMethodSection.style.display = paymentMethodSelect.value === 'payment_on_delivery' && deliveryOptionSelect.value === 'outside' ? 'block' : 'none';
+
+            // Toggle required attributes
+            document.getElementById('airtel_number').required = paymentMethodSelect.value === 'airtel_money';
+            document.getElementById('mtn_number').required = paymentMethodSelect.value === 'mtn_money';
+            deliveryMethodSelect.required = paymentMethodSelect.value === 'payment_on_delivery' && deliveryOptionSelect.value === 'outside';
+
+            // Reset delivery method selection when hidden
+            if (deliveryMethodSection.style.display === 'none') {
+                deliveryMethodSelect.value = '';
+            }
+
+            updateOrderSummary();
+        }
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+
+            // Clear previous invalid states
+            checkoutForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            isStudentError.style.display = 'none';
+            isStudentOutsideError.style.display = 'none';
+            deliveryMethodError.style.display = 'none';
+
+            // Validate delivery option
+            if (!deliveryOptionSelect.value) {
+                isValid = false;
+                deliveryOptionSelect.classList.add('is-invalid');
+            }
+
+            // Validate student status
+            if (deliveryOptionSelect.value === 'inside' && isStudentSelect.value === 'no') {
+                isValid = false;
+                isStudentSelect.classList.add('is-invalid');
+                isStudentError.style.display = 'block';
+            } else if (deliveryOptionSelect.value === 'outside' && isStudentOutsideSelect.value === 'no') {
+                isValid = false;
+                isStudentOutsideSelect.classList.add('is-invalid');
+                isStudentOutsideError.style.display = 'block';
+            }
+
+            // Validate phone number based on delivery option
+            const phoneField = deliveryOptionSelect.value === 'inside' ?
+                document.getElementById('phone_number_inside') :
+                document.getElementById('phone_number_outside');
+
+            if (phoneField && !phoneField.checkValidity()) {
+                isValid = false;
+                phoneField.classList.add('is-invalid');
+            }
+
+            // Validate payment method
+            if (!paymentMethodSelect.value) {
+                isValid = false;
+                paymentMethodSelect.classList.add('is-invalid');
+            }
+
+            // Validate delivery method for payment on delivery (outside campus only)
+            if (paymentMethodSelect.value === 'payment_on_delivery' && deliveryOptionSelect.value === 'outside' && !deliveryMethodSelect.value) {
+                isValid = false;
+                deliveryMethodSelect.classList.add('is-invalid');
+                deliveryMethodError.style.display = 'block';
+            }
+
+            // Validate mobile money numbers if selected
+            if (paymentMethodSelect.value === 'airtel_money' && !document.getElementById('airtel_number').checkValidity()) {
+                isValid = false;
+                document.getElementById('airtel_number').classList.add('is-invalid');
+            }
+
+            if (paymentMethodSelect.value === 'mtn_money' && !document.getElementById('mtn_number').checkValidity()) {
+                isValid = false;
+                document.getElementById('mtn_number').classList.add('is-invalid');
+            }
+
+            return isValid;
+        }
+
+        // Event listeners for dynamic field visibility
+        deliveryOptionSelect.addEventListener('change', toggleDeliveryFields);
+        isStudentSelect.addEventListener('change', toggleStudentFieldsInside);
+        isStudentOutsideSelect.addEventListener('change', toggleStudentFieldsOutside);
+        paymentMethodSelect.addEventListener('change', togglePaymentFields);
+        deliveryMethodSelect.addEventListener('change', updateOrderSummary);
+
+        // Form submission
+        checkoutForm.addEventListener('submit', function(event) {
+            if (!validateForm()) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Scroll to first invalid field
+                const firstInvalid = checkoutForm.querySelector('.is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }
+
+            checkoutForm.classList.add('was-validated');
+        });
+
+        // Initialize field visibility and order summary
+        toggleDeliveryFields();
+        toggleStudentFieldsInside();
+        toggleStudentFieldsOutside();
+        togglePaymentFields();
+        updateOrderSummary();
+    });
+</script>
+
+{% endblock %}
