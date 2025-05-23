@@ -1,0 +1,221 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EHC Marketplace{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <!-- Bootstrap Icons (for navbar and footer) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Font Awesome (retained from original) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        main {
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .alert {
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease-out;
+            margin-bottom: 1.5rem;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-color: #6ee7b7;
+        }
+        
+        .alert-error,
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-color: #f87171;
+        }
+        
+        .alert-info {
+            background-color: #e0f2fe;
+            color: #1e40af;
+            border-color: #60a5fa;
+        }
+        
+        .alert-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-color: #fbbf24;
+        }
+        
+        body.bg-dark .alert-success {
+            background-color: #047857;
+            color: #d1fae5;
+            border-color: #10b981;
+        }
+        
+        body.bg-dark .alert-error,
+        body.bg-dark .alert-danger {
+            background-color: #991b1b;
+            color: #fee2e2;
+            border-color: #ef4444;
+        }
+        
+        body.bg-dark .alert-info {
+            background-color: #1e40af;
+            color: #e0f2fe;
+            border-color: #3b82f6;
+        }
+        
+        body.bg-dark .alert-warning {
+            background-color: #92400e;
+            color: #fef3c7;
+            border-color: #f59e0b;
+        }
+        
+        .btn-close {
+            filter: opacity(0.6);
+            transition: filter 0.2s ease;
+        }
+        
+        .btn-close:hover {
+            filter: opacity(1);
+        }
+        
+        @media (max-width: 767px) {
+            main {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .alert {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+        }
+        
+        body.mobile-mode {
+            width: 390px;
+            margin: auto;
+            border: 2px solid #ccc;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            overflow-x: hidden;
+        }
+        
+        body.desktop-mode {
+            width: 100%;
+            margin: 0;
+            box-shadow: none;
+        }
+        /* Force navbar collapse on mobile-mode */
+        
+        body.mobile-mode .navbar .navbar-collapse {
+            display: none !important;
+        }
+        
+        body.mobile-mode .navbar .navbar-toggler {
+            display: block !important;
+        }
+        
+        body.desktop-mode .navbar .navbar-collapse {
+            display: flex !important;
+        }
+        
+        body.desktop-mode .navbar .navbar-toggler {
+            display: none !important;
+        }
+        
+        #viewToggleBtn {
+            white-space: nowrap;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="bg-gray-100 text-gray-900 antialiased">
+    {% include 'include/navbar.html' %}
+
+    <main class="container mx-auto px-4 py-8">
+        {% if messages %} {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <div class="flex items-center">
+                {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle mr-2 text-lg"></i> {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <i class="fas fa-exclamation-circle mr-2 text-lg"></i> {% elif message.tags == 'info' %}
+                <i class="fas fa-info-circle mr-2 text-lg"></i> {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-triangle mr-2 text-lg"></i> {% endif %}
+                <span>{{ message }}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close alert"></button>
+        </div>
+        {% endfor %} {% endif %} {% block content %} {% endblock %}
+    </main>
+
+    {% include 'include/footer.html' %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <!-- jQuery (retained from original) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script>
+        // Ensure alerts are accessible and dismissible
+        document.addEventListener('DOMContentLoaded', () => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.addEventListener('closed.bs.alert', () => {
+                    console.log('Alert dismissed');
+                });
+            });
+        });
+        const toggleBtn = document.getElementById("viewToggleBtn");
+        let isMobile = false;
+
+        toggleBtn.addEventListener("click", () => {
+            isMobile = !isMobile;
+            document.body.classList.toggle("mobile-mode", isMobile);
+            document.body.classList.toggle("desktop-mode", !isMobile);
+            toggleBtn.textContent = isMobile ? "Switch to Desktop View" : "Switch to Mobile View";
+
+            // Collapse navbar when switching to mobile
+            const navbarCollapse = document.querySelector(".navbar-collapse");
+            if (isMobile) {
+                navbarCollapse.classList.remove("show");
+            } else {
+                navbarCollapse.classList.add("show");
+            }
+        });
+
+        // Set default view to desktop
+        document.body.classList.add("desktop-mode");
+        // Set initial mode
+    </script>
+    {% block extra_js %} {% endblock %}
+</body>
+
+</html>

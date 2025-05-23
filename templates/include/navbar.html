@@ -1,0 +1,473 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EHC Marketplace{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+
+    <style>
+        body {
+            padding-top: 80px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .navbar {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-link {
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-1px);
+        }
+        
+        body.bg-dark .navbar {
+            background-color: #1f2937 !important;
+        }
+        
+        body.bg-dark .nav-link,
+        body.bg-dark .dropdown-item {
+            color: #e5e7eb !important;
+        }
+        
+        body.bg-dark .dropdown-menu {
+            background-color: #1f2937;
+            border-color: #374151;
+        }
+        
+        #clock {
+            font-family: 'Courier New', monospace;
+            min-width: 130px;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+        
+        .profile-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 2px solid #e5e7eb;
+            transition: border-color 0.3s ease;
+        }
+        
+        .profile-img-fallback {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #6b7280;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-right: 10px;
+            border: 2px solid #e5e7eb;
+        }
+        
+        body.bg-dark .profile-img,
+        body.bg-dark .profile-img-fallback {
+            border-color: #374151;
+        }
+        
+        .dropdown-menu {
+            min-width: 180px;
+            border-radius: 0.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            animation: slideDown 0.2s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chatbot-container {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-input {
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .chatbot-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .chatbot-output {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 280px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        body.bg-dark .chatbot-output {
+            background-color: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .debug-panel {
+            position: fixed;
+            top: 90px;
+            left: 10px;
+            background: #fefcbf;
+            border: 1px solid #d97706;
+            padding: 12px;
+            border-radius: 0.5rem;
+            z-index: 2000;
+            font-size: 0.85rem;
+        }
+        
+        .dropdown-trigger {
+            cursor: pointer;
+            transition: color 0.2s ease;
+            margin-left: 8px;
+        }
+        
+        .dropdown-trigger:hover {
+            color: #3b82f6;
+        }
+        
+        .logout-btn {
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        
+        body.bg-dark .logout-btn {
+            background-color: #991b1b;
+            color: #e5e7eb;
+        }
+        
+        body.bg-dark .logout-btn:hover {
+            background-color: #b91c1c;
+        }
+        
+        @media (max-width: 991px) {
+            .navbar-nav {
+                text-align: center;
+                padding: 1rem 0;
+            }
+            .chatbot-container {
+                margin: 1rem auto;
+                width: 100%;
+                max-width: 300px;
+            }
+            .chatbot-output {
+                width: 100%;
+            }
+            .logout-btn {
+                margin: 0.5rem auto;
+                width: 100%;
+                text-align: center;
+            }
+        }
+        
+        body.mobile-mode .navbar-toggler {
+            display: block !important;
+        }
+        
+        body.desktop-mode .navbar-toggler {
+            display: none !important;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-gray-100 text-gray-900 antialiased">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+        <div class="container mx-auto px-4">
+            <!-- <a class="navbar-brand font-bold text-xl text-blue-600" href="{% url 'marketplace:home' %}">EHC Marketplace</a> -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+                <!-- <button class="btn btn-outline-primary ms-2" id="viewToggleBtn" type="button">
+                    Switch to Mobile View -->
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto space-x-2">
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded-md hover:bg-blue-50 hover:text-blue-600" href="{% url 'marketplace:home' %}" aria-current="{% if request.path == '/' %}page{% endif %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded-md hover:bg-blue-50 hover:text-blue-600" href="{% url 'marketplace:product_list' %}">Products</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded-md hover:bg-blue-50 hover:text-blue-600" href="{% url 'marketplace:my_products' %}">My Products</a>
+                    </li>
+                    {% endif %} {% if user.is_seller %}
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded-md hover:bg-blue-50 hover:text-blue-600" href="{% url 'reports:sales_report' %}">Sales Reports</a>
+                    </li>
+                    {% endif %} {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded-md hover:bg-blue-50 hover:text-blue-600" href="{% url 'reports:admin_report' %}">Admin Reports</a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <ul class="navbar-nav align-items-lg-center space-x-2">
+                    <!-- Chatbot -->
+                    {% if user.is_authenticated %}
+                    <li class="nav-item chatbot-container">
+                        <div class="flex items-center space-x-2">
+                            <input id="chatInput" type="text" class="chatbot-input px-4 py-2 border border-gray-300 rounded-md focus:outline-none w-64" placeholder="Ask me something..." aria-label="Chatbot input">
+                            <button onclick="sendToBot()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" aria-label="Send chatbot message">Send</button>
+                        </div>
+                        <div id="chatOutput" class="chatbot-output hidden"></div>
+                    </li>
+                    {% endif %}
+
+                    <!-- Real-Time Clock -->
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 text-red-600 font-mono" href="#" id="clock" onclick="showDate()" aria-label="Current time and date">Loading...</a>
+                    </li>
+
+                    <!-- Dark Mode Toggle -->
+                    <li class="nav-item flex items-center">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input w-10 h-5" type="checkbox" id="darkModeToggle" aria-label="Toggle dark mode" onchange="toggleDarkMode()">
+                            <label class="form-check-label text-sm ml-2" for="darkModeToggle">Dark Mode</label>
+                        </div>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded-md hover:bg-blue-50 hover:text-blue-600" href="{% url 'marketplace:cart' %}">
+                            <i class="bi bi-cart mr-1"></i> Cart {% if unread_messages_count > 0 %}
+                            <span class="text-danger fw-bold">({{ unread_messages_count }})</span> {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item flex items-center" id="userDropdown">
+                        <!-- Profile Link -->
+                        <a class="nav-link flex items-center px-3 py-2 rounded-md hover:bg-blue-50 hover:text-blue-600" href="{% url 'accounts:profile' %}" aria-label="View profile for {{ user.username }}">
+                            {% if user.profile.profile_picture %}
+                            <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}'s profile picture" class="profile-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                            <div class="profile-img-fallback" style="display: none;">{{ user.username|slice:":1"|upper }}</div>
+                            {% else %}
+                            <div class="profile-img-fallback">{{ user.username|slice:":1"|upper }}</div>
+                            {% endif %}
+                            <span class="text-sm">{{ user.username }}</span>
+                        </a>
+                        <!-- Dropdown Trigger -->
+                        <i class="bi bi-chevron-down dropdown-trigger text-gray-600 hover:text-blue-600" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu options"></i>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item px-4 py-2 hover:bg-blue-50 hover:text-blue-600" href="{% url 'accounts:profile' %}">Profile</a></li>
+                            <li><a class="dropdown-item px-4 py-2 hover:bg-blue-50 hover:text-blue-600" href="{% url 'accounts:subscription_status' %}">Subscription</a></li>
+                            <li><a class="dropdown-item px-4 py-2 hover:bg-blue-50 hover:text-blue-600" href="{% url 'accounts:edit_profile' %}">Update</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form action="{% url 'accounts:logout' %}" method="post" class="px-4 py-2">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item hover:bg-blue-50 hover:text-blue-600 w-full text-left" aria-label="Logout">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- Standalone Logout Button -->
+                    <li class="nav-item">
+                        <form action="{% url 'accounts:logout' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 logout-btn" aria-label="Logout">
+                                <i class="bi bi-box-arrow-right mr-1"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded-md hover:bg-blue-50 hover:text-blue-600" href="{% url 'accounts:login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" href="{% url 'accounts:register' %}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <!-- Custom Scripts -->
+    <script>
+        // CSRF Token Setup for AJAX
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // Clock Functions
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString([], {
+                hour12: true
+            });
+            document.getElementById('clock').textContent = time;
+        }
+
+        function showDate() {
+            const now = new Date();
+            const date = now.toLocaleDateString();
+            const time = now.toLocaleTimeString([], {
+                hour12: true
+            });
+            document.getElementById('clock').textContent = `${time} | ${date}`;
+            setTimeout(updateClock, 1000);
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('bg-dark');
+            document.body.classList.toggle('text-light');
+            document.body.classList.toggle('bg-gray-100');
+            document.body.classList.toggle('text-gray-900');
+            const navbar = document.querySelector('.navbar');
+            navbar.classList.toggle('bg-white', !isDark);
+            navbar.classList.toggle('bg-dark', isDark);
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Chatbot Functionality
+        function sendToBot() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            const chatOutput = document.getElementById('chatOutput');
+            if (!message) return;
+
+            chatOutput.classList.remove('hidden');
+            fetch(`/chatbot/respond/?message=` + encodeURIComponent(message), {
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    const response = document.createElement('p');
+                    response.className = 'text-sm p-2 border-b border-gray-200';
+                    response.textContent = data.response;
+                    chatOutput.appendChild(response);
+                    chatOutput.scrollTop = chatOutput.scrollHeight;
+                    chatInput.value = '';
+                })
+                .catch(error => {
+                    console.error('Chatbot error:', error);
+                    chatOutput.innerHTML += `<p class="text-red-500 text-sm p-2">Error: Unable to get response</p>`;
+                });
+        }
+
+        // Initialize and Debug
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page loaded successfully');
+
+            // Load dark mode preference
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('bg-dark', 'text-light');
+                document.body.classList.remove('bg-gray-100', 'text-gray-900');
+                document.querySelector('.navbar').classList.add('bg-dark');
+                document.querySelector('.navbar').classList.remove('bg-white');
+                document.getElementById('darkModeToggle').checked = true;
+            }
+
+            // Debug Bootstrap
+            if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+                console.log('Bootstrap Dropdown module loaded');
+            } else {
+                console.error('Bootstrap Dropdown module not loaded');
+            }
+
+            // Debug dropdown
+            const dropdownToggle = document.querySelector('#navbarDropdown');
+            if (dropdownToggle) {
+                console.log('Dropdown toggle found for user: {{ user.username|escapejs }}');
+                dropdownToggle.addEventListener('click', () => {
+                    console.log('Dropdown toggle clicked for user: {{ user.username|escapejs }}');
+                });
+            } else {
+                console.error('Dropdown toggle not found');
+            }
+
+            // Fallback for dropdown if Bootstrap fails
+            if (!bootstrap || !bootstrap.Dropdown) {
+                dropdownToggle.addEventListener('click', () => {
+                    const dropdownMenu = dropdownToggle.nextElementSibling;
+                    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+                    console.log('Fallback dropdown toggled');
+                });
+            }
+
+            // Chatbot input enter key support
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendToBot();
+                }
+            });
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
+
+</html>

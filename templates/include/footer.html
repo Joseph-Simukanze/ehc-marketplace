@@ -1,0 +1,115 @@
+{% load static %}
+<footer class="mt-8 py-6 bg-gray-800 text-gray-200 transition-all duration-300">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- About Section -->
+            <div>
+                <h5 class="text-lg font-semibold text-white mb-4">EHC Marketplace</h5>
+                <p class="text-sm leading-relaxed">
+                    A vibrant marketplace for Evelyn Hone College students to buy and sell products, fostering entrepreneurship and community engagement.
+                </p>
+                <!-- Social Media Icons -->
+                <div class="mt-4 flex space-x-4">
+                    <a href="https://facebook.com/ehcmarketplace" target="_blank" class="text-gray-200 hover:text-blue-400 transition-colors duration-200" aria-label="Visit EHC Marketplace on Facebook">
+                        <i class="bi bi-facebook text-xl"></i>
+                    </a>
+                    <a href="https://twitter.com/ehcmarketplace" target="_blank" class="text-gray-200 hover:text-blue-400 transition-colors duration-200" aria-label="Visit EHC Marketplace on Twitter">
+                        <i class="bi bi-twitter text-xl"></i>
+                    </a>
+                    <a href="https://instagram.com/ehcmarketplace" target="_blank" class="text-gray-200 hover:text-blue-400 transition-colors duration-200" aria-label="Visit EHC Marketplace on Instagram">
+                        <i class="bi bi-instagram text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links Section -->
+            <div>
+                <h5 class="text-lg font-semibold text-white mb-4">Quick Links</h5>
+                <ul class="space-y-2 text-sm">
+                    <li>
+                        <a href="{% url 'marketplace:home' %}" class="text-gray-200 hover:text-blue-400 transition-colors duration-200 hover:underline">Home</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'marketplace:product_list' %}" class="text-gray-200 hover:text-blue-400 transition-colors duration-200 hover:underline">Products</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'marketplace:my_products' %}" class="text-gray-200 hover:text-blue-400 transition-colors duration-200 hover:underline">My Products</a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'marketplace:about' %}" class="text-gray-200 hover:text-blue-400 transition-colors duration-200 hover:underline">About Us</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'marketplace:contact' %}" class="text-gray-200 hover:text-blue-400 transition-colors duration-200 hover:underline">Contact Us</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Contact Us Section -->
+            <div>
+                <h5 class="text-lg font-semibold text-white mb-4">Contact Us</h5>
+                <address class="text-sm not-italic leading-relaxed">
+                    <p>Evelyn Hone College<br>
+                    Mongu, Zambia</p>
+                    <p class="mt-2">
+                        Email: <a href="mailto:support@ehc-marketplace.com" class="text-gray-200 hover:text-blue-400 transition-colors duration-200 hover:underline">support@ehc-marketplace.com</a><br>
+                        Phone: <a href="tel:+260777672440" class="text-gray-200 hover:text-blue-400 transition-colors duration-200 hover:underline">+260 777 672 440</a>
+                    </p>
+                </address>
+            </div>
+        </div>
+
+        <!-- Copyright Section -->
+        <div class="mt-8 pt-4 border-t border-gray-700 text-center">
+            <p class="text-sm text-gray-400 mb-0">
+                © {% now "Y" %} EHC Marketplace. All rights reserved.
+            </p>
+        </div>
+    </div>
+
+    <!-- Custom CSS for Footer -->
+    <style>
+        footer {
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.bg-dark footer {
+            background-color: #1f2937 !important;
+            color: #e5e7eb !important;
+        }
+        
+        body.bg-dark footer h5 {
+            color: #ffffff !important;
+        }
+        
+        body.bg-dark footer a {
+            color: #e5e7eb !important;
+        }
+        
+        body.bg-dark footer a:hover {
+            color: #60a5fa !important;
+        }
+        
+        body.bg-dark footer .border-t {
+            border-color: #374151 !important;
+        }
+        
+        footer a {
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        
+        footer a:hover {
+            transform: translateX(2px);
+        }
+        
+        @media (max-width: 767px) {
+            footer .grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+            footer .text-center {
+                text-align: center !important;
+            }
+        }
+    </style>
+</footer>
