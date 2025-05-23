@@ -1,0 +1,135 @@
+{% extends "base.html" %} {% load static %} {% block title %} Payment Result {% endblock %} {% block extra_head %}
+<style>
+    .result-card {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .icon-success {
+        font-size: 2.5rem;
+        color: #28a745;
+    }
+    
+    .icon-failure {
+        font-size: 2.5rem;
+        color: #dc3545;
+    }
+    
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+    
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    
+    .debug-panel {
+        background: #e9ecef;
+        border: 1px solid #ced4da;
+        padding: 10px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+    
+    @media (max-width: 576px) {
+        .result-card {
+            padding: 1rem;
+        }
+        h2 {
+            font-size: 1.5rem;
+        }
+        .icon-success,
+        .icon-failure {
+            font-size: 2rem;
+        }
+        .btn {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+    }
+</style>
+{% endblock %} {% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 result-card">
+
+            <!-- Debug Info -->
+            <div class="debug-panel">
+                <p>Debug: {% if user.is_authenticated %}Authenticated as {{ user.username }}{% else %}Not authenticated{% endif %}</p>
+                <p>Payment URL: {% url 'payments:payment_page' %}</p>
+                {% if payment %}
+                <p>Payment: transaction_id={{ payment.transaction_id|default:"N/A" }}, amount={{ payment.amount|floatformat:2|default:"N/A" }}, network={{ payment.network|default:"N/A" }}, phone={{ payment.phone|default:"N/A" }}, is_verified={{ payment.is_verified|yesno:"True,False"
+                    }}</p>
+                {% else %}
+                <p>Context: is_successful={{ is_successful|yesno:"True,False" }}, amount={{ amount|default:"N/A" }}, network={{ network|default:"N/A" }}, phone={{ phone|default:"N/A" }}</p>
+                {% endif %}
+            </div>
+
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    {% if payment %} {% if payment.is_verified %}
+                    <span class="icon-success mb-3" role="img" aria-label="Success checkmark">✅</span>
+                    <h2 class="text-success mb-3">Payment Successful!</h2>
+                    <p>Payment of <strong>ZMW {{ payment.amount|floatformat:2 }}</strong> via <strong>{{ payment.network|title }}</strong> to <strong>{{ payment.phone }}</strong> was successful.</p>
+                    <p>Transaction ID: <strong>{{ payment.transaction_id }}</strong></p>
+                    {% if payment.order %}
+                    <p>Order ID: <strong>{{ payment.order.id }}</strong></p>
+                    {% endif %} {% else %}
+                    <span class="icon-failure mb-3" role="img" aria-label="Failure cross">❌</span>
+                    <h2 class="text-danger mb-3">Payment Failed</h2>
+                    <p>Sorry, payment via <strong>{{ payment.network|title }}</strong> to <strong>{{ payment.phone }}</strong> failed.</p>
+                    <p>Transaction ID: <strong>{{ payment.transaction_id }}</strong></p>
+                    {% if error_message %}
+                    <p>Error: {{ error_message|escape }}</p>
+                    {% else %}
+                    <p>Please try again or contact support.</p>
+                    {% endif %} {% endif %} {% else %} {% if is_successful %}
+                    <span class="icon-success mb-3" role="img" aria-label="Success checkmark">✅</span>
+                    <h2 class="text-success mb-3">Payment Successful!</h2>
+                    <p>Payment of <strong>ZMW {{ amount|floatformat:2 }}</strong> via <strong>{{ network|title }}</strong> to <strong>{{ phone }}</strong> was successful.</p>
+                    {% else %}
+                    <span class="icon-failure mb-3" role="img" aria-label="Failure cross">❌</span>
+                    <h2 class="text-danger mb-3">Payment Failed</h2>
+                    <p>Sorry, payment via <strong>{{ network|title }}</strong> to <strong>{{ phone }}</strong> failed.</p>
+                    {% if error_message %}
+                    <p>Error: {{ error_message|escape }}</p>
+                    {% else %}
+                    <p>Please try again or contact support.</p>
+                    {% endif %} {% endif %} {% endif %}
+
+                    <div class="mt-4">
+                        {% if payment and payment.is_verified %}
+                        <a href="{% url 'payments:generate_receipt' transaction_id=payment.transaction_id %}" class="btn btn-success me-2">Download Receipt</a> {% endif %}
+                        <a href="{% url 'payments:payment_page' %}" class="btn btn-primary me-2">Make Another Payment</a>
+                        <a href="{% url 'marketplace:home' %}" class="btn btn-secondary">Return to Home</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

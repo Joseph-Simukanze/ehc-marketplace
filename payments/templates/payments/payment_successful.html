@@ -1,0 +1,62 @@
+{% extends 'base.html' %} {% block title %}Payment Successful - EHC Marketplace{% endblock %} {% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow text-center">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Payment Successful</h5>
+            </div>
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-check fa-3x"></i>
+                    </div>
+                    <h4>Thank you for your payment!</h4>
+                    <p class="text-muted">Your payment has been successfully processed.</p>
+                </div>
+
+                <div class="alert alert-success mb-4">
+                    <p class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i> Your payment of <strong>ZMW {{ payment.amount }}</strong> via {% if payment.payment_method == 'mtn' %}MTN Mobile Money{% else %}Airtel Money{% endif %} has been confirmed.
+                    </p>
+                </div>
+
+                {% if payment.order %}
+                <div class="mb-4">
+                    <h5>Order Details</h5>
+                    <p class="mb-1"><strong>Order Number:</strong> {{ payment.order.id }}</p>
+                    <p class="mb-1"><strong>Order Date:</strong> {{ payment.order.order_date|date:"F d, Y H:i" }}</p>
+                    <p class="mb-1"><strong>Delivery Location:</strong> {{ payment.order.delivery_location }}</p>
+                    <p class="mb-0"><strong>Order Status:</strong> {{ payment.order.status|title }}</p>
+                </div>
+                {% endif %}
+
+                <div class="mb-4">
+                    <h5>Transaction Details</h5>
+                    <p class="mb-1"><strong>Transaction ID:</strong> {{ payment.transaction_id }}</p>
+                    <p class="mb-1"><strong>Amount:</strong> ZMW {{ payment.amount }}</p>
+                    <p class="mb-0"><strong>Date:</strong> {{ payment.payment_date|date:"F d, Y H:i" }}</p>
+                </div>
+
+                <!-- Updated Receipt and Navigation Buttons -->
+                <div class="d-grid gap-2 col-md-6 mx-auto">
+                    {% if payment.order %}
+                    <a href="{% url 'generate_receipt' payment.order.id %}" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-file-invoice me-2"></i> Download Receipt
+                    </a>
+                    <a href="{% url 'marketplace:home' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-2"></i> Back to Home
+                    </a>
+                    {% else %}
+                    <a href="{% url 'accounts:subscription_status' %}" class="btn btn-primary">
+                        <i class="fas fa-crown me-2"></i> View Subscription
+                    </a>
+                    <a href="{% url 'marketplace:home' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-2"></i> Back to Home
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %} {% block title %}Export Sales Report CSV - EHC Marketplace{% endblock %} {% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fs-2 fw-bold text-primary" role="heading" aria-level="1">Export Sales Report (CSV)</h1>
+        <div>
+            <a href="{% url 'reports:admin_report' %}" class="btn btn-outline-primary btn-hover">
+                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Export Form -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Export Sales Data</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-4">Select a date range to export sales data as a CSV file.</p>
+            <form id="csv-export-form" method="get" action="{% url 'reports:download_sales_report_csv' %}" class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <label for="start-date" class="form-label">Start Date</label>
+                    <input type="date" id="start-date" name="start_date" class="form-control" value="{{ request.GET.start_date|default_if_none:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="end-date" class="form-label">End Date</label>
+                    <input type="date" id="end-date" name="end_date" class="form-control" value="{{ request.GET.end_date|default_if_none:'' }}" required>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary btn-hover w-100">
+                        <i class="fas fa-file-csv me-2"></i> Export CSV
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Instructions</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Select a start and end date to filter the sales data.</li>
+                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Click "Export CSV" to download a file containing order details.</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i> The CSV file includes Order ID, Customer, Items, Total, Status, and Date.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<style>
+    /* Hover effects */
+    
+    .btn-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        background-color: #0052cc;
+        border-color: #0052cc;
+        color: #fff;
+    }
+    
+    .btn-light.btn-hover:hover {
+        background-color: #e9ecef;
+        color: #212529;
+    }
+    /* Dark mode compatibility */
+    
+    body.bg-dark .card {
+        background-color: #343a40;
+        color: #f8f9fa;
+    }
+    
+    body.bg-dark .card-header {
+        background-color: #495057;
+    }
+    
+    body.bg-dark .text-muted {
+        color: #adb5bd !important;
+    }
+    
+    body.bg-dark .form-control {
+        background-color: #495057;
+        color: #f8f9fa;
+        border-color: #6c757d;
+    }
+    
+    body.bg-dark .form-control:focus {
+        background-color: #495057;
+        color: #f8f9fa;
+        border-color: #80bdff;
+    }
+    /* Responsive adjustments */
+    
+    @media (max-width: 767px) {
+        .card-body {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}

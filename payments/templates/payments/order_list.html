@@ -1,0 +1,149 @@
+{% extends 'base.html' %} {% block title %}My Orders - EHC Marketplace{% endblock %} {% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-clipboard-list text-primary me-2"></i> My Orders
+        </h2>
+        <div>
+            <a href="{% url 'marketplace:home' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+            </a>
+        </div>
+    </div>
+
+    {% if orders %}
+    <div class="card border-0 shadow-lg">
+        <div class="card-header bg-primary text-white py-3">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <h5 class="mb-0">Order #</h5>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="mb-0">Date</h5>
+                </div>
+                <div class="col-md-2">
+                    <h5 class="mb-0">Items</h5>
+                </div>
+                <div class="col-md-2">
+                    <h5 class="mb-0">Status</h5>
+                </div>
+                <div class="col-md-2 text-end">
+                    <h5 class="mb-0">Total</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="list-group list-group-flush">
+                {% for order in orders %}
+                <a href="{% url 'payments:order_detail' order.id %}" class="list-group-item list-group-item-action py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <strong>#{{ order.id }}</strong>
+                        </div>
+                        <div class="col-md-3">
+                            {{ order.order_date|date:"M d, Y" }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ order.items.count }} item{{ order.items.count|pluralize }}
+                        </div>
+                        <div class="col-md-2">
+                            <span class="badge 
+                                {% if order.status == 'completed' %}bg-success
+                                {% elif order.status == 'processing' %}bg-primary
+                                {% elif order.status == 'cancelled' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ order.status|title }}
+                            </span>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <strong class="h5">ZMW {{ order.total_amount }}</strong>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="mt-4" aria-label="Order pagination">
+        <ul class="pagination justify-content-center">
+            {% if orders.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ orders.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %} {% for num in orders.paginator.page_range %} {% if orders.number == num %}
+            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %} {% endfor %} {% if orders.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ orders.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ orders.paginator.num_pages }}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-box-open fa-4x text-muted"></i>
+        </div>
+        <h3 class="mb-3">No Orders Yet</h3>
+        <p class="lead text-muted mb-4">You haven't placed any orders with us yet.</p>
+        <a href="{% url 'marketplace:home' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-basket me-2"></i> Start Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .list-group-item {
+        transition: all 0.2s ease;
+        border-left: 0;
+        border-right: 0;
+    }
+    
+    .list-group-item:first-child {
+        border-top: 0;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: 0;
+    }
+    
+    .list-group-item:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+        transform: translateX(2px);
+    }
+    
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.35em 0.65em;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+    
+    .pagination .page-link {
+        color: var(--primary);
+    }
+</style>
+{% endblock %}

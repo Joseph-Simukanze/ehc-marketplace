@@ -1,0 +1,211 @@
+{% extends 'base.html' %} {% block title %}Payment Successful - EHC Marketplace{% endblock %} {% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Card -->
+            <div class="card border-0 shadow-lg overflow-hidden">
+                <!-- Card Header with Confetti Effect -->
+                <div class="card-header bg-success text-white position-relative py-4">
+                    <div class="confetti"></div>
+                    <div class="position-relative z-index-1 text-center">
+                        <i class="fas fa-check-circle fa-4x mb-3 text-white-50"></i>
+                        <h2 class="mb-0">Payment Successful!</h2>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-lg-5">
+                    <!-- Success Message -->
+                    <div class="text-center mb-5">
+                        <div class="success-icon mb-4">
+                            <svg width="100" height="100" viewBox="0 0 100 100" class="text-success">
+                                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="283" style="animation: circle-fill 1s ease-in-out forwards;"></circle>
+                                <path d="M30,50 l15,15 l25,-25" fill="none" stroke="currentColor" stroke-width="8" stroke-dasharray="50" stroke-dashoffset="50" style="animation: check-mark 0.5s 0.5s ease-in-out forwards;"></path>
+                            </svg>
+                        </div>
+                        <h3 class="mb-3">Thank you for your payment!</h3>
+                        <p class="lead text-muted">Your transaction has been completed successfully.</p>
+                    </div>
+
+                    <!-- Payment Confirmation -->
+                    <div class="alert alert-success bg-success-light border-success d-flex align-items-center mb-4">
+                        <i class="fas fa-check-circle fa-2x text-success me-3"></i>
+                        <div>
+                            <p class="mb-0">
+                                Payment of <strong class="h4">ZMW {{ payment.amount }}</strong> via {% if payment.payment_method == 'mtn' %}
+                                <span class="badge bg-primary bg-opacity-10 text-primary">MTN Mobile Money</span> {% else %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger">Airtel Money</span> {% endif %} was successful.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- Order Details -->
+                        {% if payment.order %}
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0"><i class="fas fa-shopping-bag me-2"></i> Order Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Order Number:</span>
+                                            <strong>#{{ payment.order.id }}</strong>
+                                        </li>
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Date:</span>
+                                            <strong>{{ payment.order.order_date|date:"M d, Y H:i" }}</strong>
+                                        </li>
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Delivery:</span>
+                                            <strong>{{ payment.order.delivery_location }}</strong>
+                                        </li>
+                                        <li class="d-flex justify-content-between">
+                                            <span class="text-muted">Status:</span>
+                                            <span class="badge bg-{% if payment.order.status == 'completed' %}success{% else %}warning{% endif %} bg-opacity-10 text-{% if payment.order.status == 'completed' %}success{% else %}warning{% endif %}">
+                                                {{ payment.order.status|title }}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Transaction Details -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i> Transaction Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Reference:</span>
+                                            <strong>{{ payment.transaction_id }}</strong>
+                                        </li>
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Amount:</span>
+                                            <strong class="text-success">ZMW {{ payment.amount }}</strong>
+                                        </li>
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Method:</span>
+                                            <strong>
+                                                {% if payment.payment_method == 'mtn' %}
+                                                <i class="fas fa-mobile-alt text-primary me-1"></i>MTN
+                                                {% else %}
+                                                <i class="fas fa-mobile text-danger me-1"></i>Airtel
+                                                {% endif %}
+                                            </strong>
+                                        </li>
+                                        <li class="d-flex justify-content-between">
+                                            <span class="text-muted">Processed:</span>
+                                            <strong>{{ payment.payment_date|date:"M d, Y H:i" }}</strong>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-3 mt-5">
+                        {% if payment.order %}
+                        <a href="{% url 'payments:generate_receipt' payment.order.id %}" class="btn btn-primary btn-lg py-3" target="_blank">
+                            <i class="fas fa-file-pdf me-2"></i> Download Receipt
+                        </a>
+                        <div class="d-flex gap-3">
+                            <a href="{% url 'payments:order_details' payment.order.id %}" class="btn btn-outline-primary flex-grow-1 py-3">
+                                <i class="fas fa-clipboard-list me-2"></i> View Order
+                            </a>
+                            <a href="{% url 'marketplace:home' %}" class="btn btn-outline-secondary flex-grow-1 py-3">
+                                <i class="fas fa-home me-2"></i> Back Home
+                            </a>
+                        </div>
+                        {% else %}
+                        <a href="{% url 'subscription_status' %}" class="btn btn-primary btn-lg py-3">
+                            <i class="fas fa-crown me-2"></i> View Subscription
+                        </a>
+                        <a href="{% url 'marketplace:home' %}" class="btn btn-outline-primary btn-lg py-3">
+                            <i class="fas fa-home me-2"></i> Back to Home
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Card -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body text-center py-4">
+                    <h5 class="mb-3"><i class="fas fa-headset me-2 text-primary"></i> Need help with your order?</h5>
+                    <a href="mailto:support@ehcmarketplace.com" class="btn btn-outline-secondary">
+                        <i class="fas fa-envelope me-2"></i> Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Success Animation */
+    
+    @keyframes circle-fill {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+    
+    @keyframes check-mark {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+    /* Confetti Effect */
+    
+    .confetti {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='rgba(255,255,255,0.3)'/%3E%3C/svg%3E");
+        opacity: 0.6;
+    }
+    
+    .success-icon {
+        display: inline-block;
+        position: relative;
+    }
+    
+    .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+    
+    .z-index-1 {
+        z-index: 1;
+    }
+    
+    .card-header {
+        border-bottom: none;
+    }
+    
+    .list-unstyled li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .list-unstyled li:last-child {
+        border-bottom: none;
+    }
+</style>
+
+<script>
+    // Add slight delay for animation visibility
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            document.querySelector('.success-icon').classList.add('animate');
+        }, 100);
+    });
+</script>
+{% endblock %}

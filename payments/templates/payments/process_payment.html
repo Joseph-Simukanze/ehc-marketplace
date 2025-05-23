@@ -1,0 +1,160 @@
+{% extends 'base.html' %} {% load process_filters %} {% block title %}Process Payment - EHC Marketplace{% endblock %} {% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h4 class="mb-0"><i class="fas fa-credit-card me-2"></i> Complete Your Payment</h4>
+                        <span class="badge bg-light text-primary fs-6">Order #{{ order.id }}</span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Payment Alert -->
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-info-circle fa-2x me-3"></i>
+                        <div>
+                            <h5 class="alert-heading">Payment Summary</h5>
+                            You are about to pay <strong class="h5">ZMW {{ order.total_amount }}</strong> for your order.
+                        </div>
+                    </div>
+
+                    <!-- Order Summary Card -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-receipt me-2"></i> Order Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-borderless mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="w-25 text-muted">Order Number</th>
+                                            <td>{{ order.id }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted">Items</th>
+                                            <td>
+                                                <ul class="list-unstyled mb-0">
+                                                    {% for item in order.items.all %}
+                                                    <li class="py-1">
+                                                        <span class="badge bg-primary me-2">{{ item.quantity }}x</span> {{ item.product.title }} - ZMW {{ order.total_amount|multiply:0.05 }}
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <th class="text-muted">Delivery Location</th>
+                                            <td>{{ order.delivery_location }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted">Delivery Fee</th>
+                                            <td>ZMW {{ order.delivery_fee }}</td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <th class="text-muted">Total Amount</th>
+                                            <td><strong class="h5 text-primary">ZMW {{ order.total_amount }}</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Form -->
+                    <form method="post" action="{% url 'payments:process_payment' order_id=order.id %}">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fas fa-wallet me-2"></i> Select Payment Method</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="payment-method-card form-check card p-3 border rounded-3 h-100">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="mtn" value="mtn" required>
+                                        <label class="form-check-label w-100" for="mtn">
+                                            <div class="d-flex align-items-center">
+                                                <div class="payment-icon bg-primary-light rounded-circle p-3 me-3">
+                                                    <i class="fas fa-mobile-alt fa-2x text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <strong>MTN Mobile Money</strong>
+                                                    <p class="text-muted mb-0 small">Pay with your MTN Mobile Money account</p>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="payment-method-card form-check card p-3 border rounded-3 h-100">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="airtel" value="airtel" required>
+                                        <label class="form-check-label w-100" for="airtel">
+                                            <div class="d-flex align-items-center">
+                                                <div class="payment-icon bg-danger-light rounded-circle p-3 me-3">
+                                                    <i class="fas fa-mobile fa-2x text-danger"></i>
+                                                </div>
+                                                <div>
+                                                    <strong>Airtel Money</strong>
+                                                    <p class="text-muted mb-0 small">Pay with your Airtel Money account</p>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phone Number Input -->
+                        <div class="mb-4">
+                            <label for="phone_number" class="form-label fw-bold">Mobile Money Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <input type="tel" name="phone_number" id="phone_number" class="form-control py-2" placeholder="e.g. 26097XXXXXXX" required>
+                            </div>
+                            <div class="form-text text-end">Enter the phone number registered with your mobile money account</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-3 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg py-3">
+                                <i class="fas fa-lock me-2"></i> Pay ZMW {{ order.total_amount }}
+                            </button>
+                            <a href="{% url 'payments:payment_successful' %}" class="btn btn-outline-secondary py-3">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Checkout
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .payment-method-card:hover {
+        border-color: var(--primary);
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    
+    .payment-method-card .form-check-input:checked~.form-check-label {
+        color: var(--primary);
+    }
+    
+    .payment-icon {
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .bg-primary-light {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    
+    .bg-danger-light {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+</style>
+{% endblock %}

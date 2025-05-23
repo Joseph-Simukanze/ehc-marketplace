@@ -1,0 +1,136 @@
+{% extends 'base.html' %} {% block title %}Verify Payment - EHC Marketplace{% endblock %} {% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-check-circle fa-lg me-3"></i>
+                        <h4 class="mb-0">Payment Verification</h4>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-lg-5">
+                    <!-- Payment Processing Animation -->
+                    <div class="text-center mb-5 py-3">
+                        <div class="position-relative d-inline-block mb-4">
+                            <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <i class="fas fa-mobile-alt fa-lg text-primary"></i>
+                            </div>
+                        </div>
+                        <h3 class="mb-3">Processing Your Payment</h3>
+                        <p class="text-muted lead">Please complete the payment on your mobile device</p>
+                    </div>
+
+                    <!-- Payment Instructions -->
+                    <div class="alert alert-primary border-primary bg-primary-light d-flex align-items-start mb-4">
+                        <i class="fas fa-info-circle fa-lg mt-1 me-3 text-primary"></i>
+                        <div>
+                            <h5 class="alert-heading">Payment Authorization Required</h5>
+                            <p class="mb-0">
+                                You should receive a prompt on <strong>{{ payment.phone_number }}</strong> to authorize payment of <strong class="h5">ZMW {{ payment.amount }}</strong> via {% if payment.payment_method == 'mtn' %}MTN Mobile Money{% else
+                                %}Airtel Money{% endif %}.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Details Card -->
+                    <div class="card border mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-receipt me-2"></i> Transaction Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="text-muted small mb-1">Transaction ID</h6>
+                                    <p class="fw-bold">{{ payment.transaction_id }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="text-muted small mb-1">Amount</h6>
+                                    <p class="fw-bold h5 text-primary">ZMW {{ payment.amount }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted small mb-1">Payment Method</h6>
+                                    <p class="fw-bold">
+                                        {% if payment.payment_method == 'mtn' %}
+                                        <i class="fas fa-mobile-alt text-primary me-2"></i>MTN Mobile Money {% else %}
+                                        <i class="fas fa-mobile text-danger me-2"></i>Airtel Money {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted small mb-1">Date & Time</h6>
+                                    <p class="fw-bold">{{ payment.payment_date|date:"F d, Y H:i" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg py-3">
+                                <i class="fas fa-sync-alt me-2"></i> Check Payment Status
+                            </button>
+                            <a href="#" class="btn btn-outline-secondary py-3" data-bs-toggle="modal" data-bs-target="#helpModal">
+                                <i class="fas fa-question-circle me-2"></i> Need Help?
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="helpModalLabel"><i class="fas fa-question-circle me-2"></i> Payment Help</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="fw-bold">Not receiving the payment prompt?</h6>
+                <ol class="mb-4">
+                    <li>Ensure your phone is connected to the internet</li>
+                    <li>Check that you entered the correct phone number</li>
+                    <li>Make sure you have sufficient funds in your mobile money account</li>
+                    <li>Wait a few moments as some networks may be delayed</li>
+                </ol>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i> If you've already completed payment but still see this page, please contact our support team.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="mailto:support@ehcmarketplace.com" class="btn btn-primary">
+                    <i class="fas fa-envelope me-2"></i> Contact Support
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-primary-light {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+</style>
+
+<script>
+    // Auto-refresh the page every 8 seconds to check payment status
+    setTimeout(function() {
+        document.querySelector('form').submit();
+    }, 8000);
+
+    // Add animation to the refresh button when clicked
+    document.querySelector('button[type="submit"]').addEventListener('click', function() {
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Checking...';
+    });
+</script>
+{% endblock %}

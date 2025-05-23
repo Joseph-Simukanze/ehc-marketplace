@@ -1,0 +1,12 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-5">
+    <div class="alert alert-success text-center">
+        <h2>🎉 Payment Successful!</h2>
+        <p>Thank you, {{ payment.order.buyer.username }}.</p>
+        <p>Your payment with Transaction ID <strong>{{ payment.transaction_id }}</strong> was successful.</p>
+        <p>Order ID: <strong>{{ payment.order.id }}</strong></p>
+        <p>Status: <strong>{{ payment.order.status|title }}</strong></p>
+        <a href="{% url 'marketplace:home' %}" class="btn btn-primary mt-3">Return to Marketplace</a>
+    </div>
+</div>
+{% endblock %}

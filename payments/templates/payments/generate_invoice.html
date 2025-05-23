@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice #{{ payment.id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        .invoice-box {
+            max-width: 700px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            font-size: 16px;
+        }
+        
+        .invoice-box table {
+            width: 100%;
+            line-height: inherit;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-box">
+        <h2>Invoice</h2>
+        <p><strong>Invoice ID:</strong> {{ payment.id }}</p>
+        <p><strong>Customer:</strong> {{ payment.user.username }}</p>
+        <p><strong>Amount Paid:</strong> ZMW {{ payment.amount }}</p>
+        <p><strong>Status:</strong> {{ payment.status }}</p>
+        <p><strong>Date:</strong> {{ payment.date }}</p>
+
+        <br><br>
+        <p>Thank you for your purchase!</p>
+    </div>
+</body>
+
+</html>

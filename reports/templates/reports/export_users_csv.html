@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Export Registered Users CSV - EHC Marketplace{% endblock %} {% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fs-2 fw-bold text-primary" role="heading" aria-level="1">Export Registered Users</h1>
+        <a href="{% url 'reports:admin_report' %}" class="btn btn-outline-primary btn-hover" aria-label="Back to Admin Dashboard">
+            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">CSV Export</h5>
+        </div>
+        <div class="card-body text-center">
+            {% if error %}
+            <p class="lead text-danger">{{ error }}</p>
+            {% else %}
+            <p class="lead">Your CSV file containing registered users data is being downloaded.</p>
+            <p>If the download does not start automatically, <a href="{% url 'reports:export_users_csv' %}" class="text-primary">click here to retry</a>.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

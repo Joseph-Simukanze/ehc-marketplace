@@ -1,0 +1,8 @@
+<form method="post">
+    {% csrf_token %}
+    <label>Amount:</label>
+    <input type="number" name="amount" required>
+    <label>Phone Number:</label>
+    <input type="text" name="phone" required placeholder="2609XXXXXXXX">
+    <button type="submit">Pay with MTN MoMo</button>
+</form>

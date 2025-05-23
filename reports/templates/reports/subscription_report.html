@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block content %}
+<h1>Subscription Report</h1>
+<table class="table">
+    <tr>
+        <th>Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>Active Subscriptions</td>
+        <td>{{ active_subscriptions }}</td>
+    </tr>
+    <tr>
+        <td>Total Subscribers</td>
+        <td>{{ total_subscribers }}</td>
+    </tr>
+    <tr>
+        <td>Total Subscription Revenue</td>
+        <td>{{ subscription_revenue|floatformat:2 }}</td>
+    </tr>
+</table>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.hmtl'%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Order Receipt</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+        
+        .receipt-container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .receipt-header {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="receipt-container">
+        <div class="receipt-header text-center">
+            <h2>EHC Marketplace</h2>
+            <p><strong>Order Receipt</strong></p>
+        </div>
+
+        <p><strong>Receipt Number:</strong> {{ order.receipt_number }}</p>
+        <p><strong>Date:</strong> {{ order.created_at|date:"F d, Y H:i" }}</p>
+        <p><strong>Customer:</strong> {{ order.customer.username }}</p>
+        <p><strong>Delivery Location:</strong> {{ order.delivery_location }}</p>
+        <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+
+        <hr>
+
+        <h5>Items Ordered:</h5>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price (ZMW)</th>
+                    <th>Subtotal (ZMW)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.product.price }}</td>
+                    <td>{{ item.get_total_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h5 class="text-end">Total: ZMW {{ order.total_amount }}</h5>
+
+        <div class="text-center mt-4">
+            <button onclick="window.print()" class="btn btn-primary">Print Receipt</button>
+        </div>
+    </div>
+
+</body>
+
+</html>

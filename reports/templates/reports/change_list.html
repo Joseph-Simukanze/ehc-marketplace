@@ -1,0 +1,134 @@
+{% extends "base.html" %} {% load i18n admin_urls static %} {% block extrastyle %} {{ block.super }}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+.table th,
+    .table td vertical-align: middle;
+}
+.btn-sm {
+    font-size: 0.875rem;
+}
+.badge {
+    font-size: 0.85em;
+}
+</style>
+{% endblock %} {% block content %}
+<div id="content-main" class="container py-4">
+    <!-- Header -->
+    <h1 class="mb-4 fs-2 fw-bold text-primary">{% blocktrans %}Order Management{% endblocktrans %}</h1>
+
+    <!-- Search and Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Search and Filter Orders</h5>
+        </div>
+        <div class="card-body">
+            <form id="changelist-search" method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="searchbar" class="form-label">Search by Order ID or Customer</label>
+                    <input type="text" class="form-control" name="q" id="searchbar" value="{{ cl.search_query|default_if_none:'' }}" placeholder="Enter order ID or username">
+                </div>
+                <div class="col-md-3">
+                    <label for="status_filter" class="form-label">Status</label>
+                    <select name="status" id="status_filter" class="form-select">
+                        <option value="">All Statuses</option>
+                        {% for status in status_choices %}
+                        <option value="{{ status.0 }}" {% if cl.query_params.status == status.0 %}selected{% endif %}>{{ status.1|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="date_filter_start" class="form-label">Date Range</label>
+                    <input type="date" class="form-control" name="order_date__range__start" id="date_filter_start" value="{{ cl.query_params.order_date__range__start|default_if_none:''|date:'Y-m-d' }}">
+                    <input type="date" class="form-control mt-2" name="order_date__range__end" value="{{ cl.query_params.order_date__range__end|default_if_none:''|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100" aria-label="Search Orders">
+                        <i class="fas fa-search me-2"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Orders</h5>
+            <span>{{ cl.result_count }} {% if cl.result_count == 1 %}order{% else %}orders{% endif %}</span>
+        </div>
+        <div class="card-body">
+            {% if cl.result_list %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="bg-light">
+                            <th scope="col">Order ID</th>
+                            <th scope="col">Customer</th>
+                            <th scope="col">Items</th>
+                            <th scope="col">Total (ZMW)</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Order Date</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in cl.result_list %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.buyer.get_full_name|default:order.buyer.username }}</td>
+                            <td>{{ order.items.count }}</td>
+                            <td>{{ order.total_amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ order.status|title }}
+                                </span>
+                            </td>
+                            <td>{{ order.order_date|date:'M d, Y' }}</td>
+                            <td>
+                                <a href="{% url 'admin:marketplace_order_change' order.id %}" class="btn btn-sm btn-outline-primary me-2" aria-label="Edit order {{ order.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'reports:generate_receipt' order_id=order.id %}" class="btn btn-sm btn-outline-success" aria-label="Download receipt for order {{ order.id }}">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="lead text-muted text-center">No orders found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if cl.paginator %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if cl.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ cl.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %} {% for page_num in cl.paginator.page_range %}
+            <li class="page-item {% if cl.page_num == page_num %}active{% endif %}">
+                <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+            </li>
+            {% endfor %} {% if cl.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ cl.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} {% block extrahead %} {{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

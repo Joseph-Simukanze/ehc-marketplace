@@ -1,0 +1,228 @@
+{% extends 'base.html' %} {% block title %}Order #{{ order.id }} Details - EHC Marketplace{% endblock %} {% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Order Details Card -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            <i class="fas fa-receipt me-2"></i> Order Details
+                        </h3>
+                        <span class="badge bg-light text-primary fs-6">#{{ order.id }}</span>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Order Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Order Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Order Date:</span>
+                                            <strong>{{ order.order_date|date:"M d, Y H:i" }}</strong>
+                                        </li>
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Status:</span>
+                                            <span class="badge bg-{% if order.status == 'completed' %}success{% elif order.status == 'cancelled' %}danger{% else %}warning{% endif %} bg-opacity-10 text-{% if order.status == 'completed' %}success{% elif order.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                                {{ order.status|title }}
+                                            </span>
+                                        </li>
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Payment Method:</span>
+                                            <strong>
+                                                {% if order.payment_method == 'mtn_money' %}
+                                                    <i class="fas fa-mobile-alt text-primary me-1"></i>MTN Mobile Money
+                                                {% elif order.payment_method == 'airtel_money' %}
+                                                    <i class="fas fa-mobile text-danger me-1"></i>Airtel Money
+                                                {% elif order.payment_method == 'cash' %}
+                                                    <i class="fas fa-money-bill me-1"></i>Cash
+                                                {% elif order.payment_method == 'payment_on_delivery' %}
+                                                    <i class="fas fa-truck me-1"></i>Payment on Delivery
+                                                    {% if order.delivery_method %}
+                                                        ({{ order.delivery_method|title }})
+                                                    {% endif %}
+                                                {% else %}
+                                                    <i class="fas fa-question me-1"></i>Unknown
+                                                {% endif %}
+                                            </strong>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0"><i class="fas fa-truck me-2"></i> Delivery Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Delivery Location:</span>
+                                            <strong>{{ order.delivery_location|default:"Not specified" }}</strong>
+                                        </li>
+                                        <li class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Delivery Status:</span>
+                                            <span class="badge bg-info bg-opacity-10 text-info">
+                                                {{ order.delivery_status|default:"Processing"|title }}
+                                            </span>
+                                        </li>
+                                        <li class="d-flex justify-content-between">
+                                            <span class="text-muted">Delivery Fee:</span>
+                                            <strong>ZMW {{ order.delivery_fee|floatformat:2|default:"0.00" }}</strong>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-box-open me-2"></i> Product Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                {% if order.product.image %}
+                                <img src="{{ order.product.image.url }}" alt="{{ order.product.name|default:'Product' }}" class="rounded me-4" width="120" height="120" onerror="this.src='/static/images/fallback-product.jpg';"> {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center me-4" style="width: 120px; height: 120px;">
+                                    <i class="fas fa-image text-muted" style="font-size: 2rem;"></i>
+                                </div>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    <h4>{{ order.product.name|default:"Unknown Product" }}</h4>
+                                    <p class="text-muted mb-2">{{ order.product.description|truncatewords:20|default:"No description available" }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="text-muted">Quantity:</span>
+                                            <strong class="h5 ms-2">{{ order.quantity|default:1 }}</strong>
+                                        </div>
+                                        <div>
+                                            <span class="text-muted">Unit Price:</span>
+                                            <strong class="h5 ms-2">ZMW {{ order.product.price|floatformat:2|default:"0.00" }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i> Payment Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-borderless mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-muted">Subtotal</th>
+                                            <td class="text-end">ZMW {{ order.subtotal|floatformat:2|default:"0.00" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted">Delivery Fee</th>
+                                            <td class="text-end">ZMW {{ order.delivery_fee|floatformat:2|default:"0.00" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted">Tax (16%)</th>
+                                            <td class="text-end">ZMW {{ order.tax_amount|floatformat:2|default:"0.00" }}</td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <th>Total Amount</th>
+                                            <td class="text-end h4 text-primary">ZMW {{ order.total_price|floatformat:2|default:"0.00" }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'payments:order_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Orders
+                        </a>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-primary" onclick="window.print()">
+                                <i class="fas fa-print me-2"></i> Print Receipt
+                            </a>
+                            <a href="{% url 'payments:generate_invoice' order.id %}" class="btn btn-outline-secondary" target="_blank">
+                                <i class="fas fa-file-pdf me-2"></i> Download Invoice
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Card -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body text-center py-3">
+                    <p class="mb-3">Need help with this order?</p>
+                    <a href="{% url 'marketplace:contact' %}?order_id={{ order.id }}" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-headset me-2"></i> Contact Support
+                    </a>
+                    <a href="{% url 'payments:faq' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-question-circle me-2"></i> View FAQs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .table th {
+        font-weight: 500;
+    }
+    
+    .table-borderless tbody tr:not(:last-child) {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .btn-group .btn {
+        border-radius: 0.25rem;
+    }
+</style>
+
+<script>
+    // Validate fee calculations on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get fee elements
+        const subtotal = parseFloat('{{ order.subtotal|default:"0.00" }}') || 0.00;
+        const deliveryFee = parseFloat('{{ order.delivery_fee|default:"0.00" }}') || 0.00;
+        const taxAmount = parseFloat('{{ order.tax_amount|default:"0.00" }}') || 0.00;
+        const totalPrice = parseFloat('{{ order.total_price|default:"0.00" }}') || 0.00;
+
+        // Expected total calculation
+        const expectedTotal = subtotal + deliveryFee + taxAmount;
+
+        // Check if total matches expected total
+        if (Math.abs(totalPrice - expectedTotal) > 0.01) {
+            console.warn('Total price mismatch: Expected ZMW ' + expectedTotal.toFixed(2) + ', Got ZMW ' + totalPrice.toFixed(2));
+            // Optionally display a warning to the user
+            const paymentSummary = document.querySelector('.card-body .table-responsive');
+            const warning = document.createElement('div');
+            warning.className = 'alert alert-warning mt-3';
+            warning.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> Note: There may be an issue with the total calculation. Please contact support.';
+            paymentSummary.appendChild(warning);
+        }
+    });
+</script>
+{% endblock %}

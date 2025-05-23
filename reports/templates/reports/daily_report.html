@@ -1,0 +1,506 @@
+{% extends 'base.html' %} {% load reports_filters %} {% load humanize %} {% block title %}Sales Report - EHC Marketplace{% endblock %} {% block content %}
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, #e6f0fa 0%, #f8f9fa 100%); min-height: 100vh;">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-5 px-3">
+        <div>
+            <h1 class="display-5 mb-2 text-primary fw-bold" style="font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">
+                <i class="fas fa-chart-line me-2"></i>Sales Report
+            </h1>
+            <p class="mb-0 text-muted">Analyze your sales performance and trends</p>
+        </div>
+        <div>
+            <a href="{% url 'reports:export_csv' %}?type={{ report_type }}&start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-primary shadow-sm px-4 py-2" style="border-radius: 12px; font-weight: 500;">
+                <i class="fas fa-download me-2"></i> Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Report Filter Card -->
+    <div class="card shadow-lg mb-5 border-0 animate__animated animate__fadeInUp" style="border-radius: 16px; overflow: hidden;">
+        <div class="card-header bg-primary text-white py-3" style="border-radius: 16px 16px 0 0; background: linear-gradient(90deg, #007bff, #0056b3);">
+            <h5 class="mb-0 fw-semibold"><i class="fas fa-filter me-2"></i>Report Options</h5>
+        </div>
+        <div class="card-body p-4 bg-white">
+            <form method="get" class="row g-4 align-items-end">
+                <div class="col-md-4">
+                    <label for="type" class="form-label fw-semibold text-dark">Report Type</label>
+                    <select name="type" id="type" class="form-select shadow-sm" style="border-radius: 10px; padding: 10px;" onchange="this.form.submit()">
+                        <option value="daily" {% if report_type == 'daily' %}selected{% endif %}>Daily Sales</option>
+                        <option value="monthly" {% if report_type == 'monthly' %}selected{% endif %}>Monthly Sales</option>
+                        <option value="customer" {% if report_type == 'customer' %}selected{% endif %}>Customer Sales</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="start_date" class="form-label fw-semibold text-dark">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" class="form-control shadow-sm" style="border-radius: 10px; padding: 10px;" value="{{ start_date|default_if_none:'' }}" onchange="this.form.submit()">
+                </div>
+                <div class="col-md-4">
+                    <label for="end_date" class="form-label fw-semibold text-dark">End Date</label>
+                    <input type="date" name="end_date" id="end_date" class="form-control shadow-sm" style="border-radius: 10px; padding: 10px;" value="{{ end_date|default_if_none:'' }}" onchange="this.form.submit()">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Card -->
+    {% if report_type == 'daily' %}
+    <div class="row mb-5 g-4">
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 bg-success bg-opacity-10 animate__animated animate__fadeInUp" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted small fw-bold">Total Revenue</h6>
+                            <h3 class="mb-0 fw-bold text-dark">ZMW {{ total_revenue|floatformat:2|intcomma }}</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-25 p-3 rounded-circle">
+                            <i class="fas fa-money-bill-wave fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 bg-info bg-opacity-10 animate__animated animate__fadeInUp" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted small fw-bold">Quantity Sold</h6>
+                            <h3 class="mb-0 fw-bold text-dark">{{ total_quantity|intcomma }}</h3>
+                        </div>
+                        <div class="bg-info bg-opacity-25 p-3 rounded-circle">
+                            <i class="fas fa-boxes fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 bg-primary bg-opacity-10 animate__animated animate__fadeInUp" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted small fw-bold">Total Orders</h6>
+                            <h3 class="mb-0 fw-bold text-dark">{{ total_orders|intcomma }}</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-25 p-3 rounded-circle">
+                            <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Product Sales Details -->
+    {% if report_type == 'daily' or report_type == 'monthly' %} {% for product_data in report_data %}
+    <div class="card shadow-lg mb-5 border-0 animate__animated animate__fadeInUp" style="border-radius: 16px; overflow: hidden;">
+        <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center" style="border-radius: 16px 16px 0 0; background: linear-gradient(90deg, #007bff, #0056b3);">
+            <h5 class="mb-0 fw-semibold"><i class="fas fa-cube me-2"></i>{{ product_data.product.title }}</h5>
+            <span class="badge bg-white text-primary px-3 py-2" style="border-radius: 8px; font-weight: 500;">
+                {{ product_data.product.category.name|default:'No Category' }}
+            </span>
+        </div>
+        <div class="card-body p-4 bg-white">
+            <div class="row mb-4 align-items-center">
+                <div class="col-lg-2 text-center">
+                    <img src="{{ product_data.product.image.url|default:'https://via.placeholder.com/150x150?text=Product+Image' }}" alt="{{ product_data.product.title }}" class="img-fluid rounded mb-3 shadow-sm" style="max-height: 150px;">
+                    <div class="d-grid gap-2">
+                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
+                            <i class="fas fa-box-open me-1"></i> {{ product_data.total_quantity|intcomma }} sold
+                        </span>
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                            <i class="fas fa-money-bill-wave me-1"></i> ZMW {{ product_data.total_revenue|floatformat:2|intcomma }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-10">
+                    <div class="chart-container mb-4" style="height: 300px;">
+                        <canvas id="chart-{{ product_data.product.id }}"></canvas>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle" style="border-radius: 10px; overflow: hidden;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="py-3">Date</th>
+                                    <th scope="col" class="py-3 text-end">Quantity</th>
+                                    <th scope="col" class="py-3 text-end">Revenue</th>
+                                    <th scope="col" class="py-3 text-end">Avg. Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for date, data in product_data.sales.items %}
+                                <tr class="animate__animated animate__fadeIn">
+                                    <td class="py-3">{{ date }}</td>
+                                    <td class="py-3 text-end">{{ data.quantity|intcomma }}</td>
+                                    <td class="py-3 text-end">ZMW {{ data.revenue|floatformat:2|intcomma }}</td>
+                                    <td class="py-3 text-end">ZMW {{ data.average_price|floatformat:2|intcomma }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        <i class="fas fa-exclamation-circle me-2"></i> No sales data for {{ start_date|default:'selected period' }} to {{ end_date|default:'selected period' }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <th class="py-3">Total</th>
+                                    <td class="py-3 text-end">{{ product_data.total_quantity|intcomma }}</td>
+                                    <td class="py-3 text-end">ZMW {{ product_data.total_revenue|floatformat:2|intcomma }}</td>
+                                    <td class="py-3 text-end">ZMW {{ product_data.average_price|floatformat:2|intcomma }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card shadow-lg border-0 animate__animated animate__fadeInUp" style="border-radius: 16px;">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No sales data available</h4>
+            <p class="text-muted">There are no sales records for {{ start_date|default:'selected period' }} to {{ end_date|default:'selected period' }}</p>
+        </div>
+    </div>
+    {% endfor %} {% elif report_type == 'customer' %}
+    <div class="card shadow-lg border-0 animate__animated animate__fadeInUp" style="border-radius: 16px; overflow: hidden;">
+        <div class="card-header bg-primary text-white py-3" style="border-radius: 16px 16px 0 0; background: linear-gradient(90deg, #007bff, #0056b3);">
+            <h5 class="mb-0 fw-semibold"><i class="fas fa-users me-2"></i>Customer Sales Report ({{ start_date|default:'Not selected' }} to {{ end_date|default:'Not selected' }})</h5>
+        </div>
+        <div class="card-body p-4 bg-white">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle" style="border-radius: 10px; overflow: hidden;">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="py-3">Customer</th>
+                            <th scope="col" class="py-3 text-end">Orders</th>
+                            <th scope="col" class="py-3 text-end">Items</th>
+                            <th scope="col" class="py-3 text-end">Total Spent</th>
+                            <th scope="col" class="py-3 text-end">Avg. Order</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer_data in customer_sales %}
+                        <tr class="animate__animated animate__fadeIn">
+                            <td class="py-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar avatar-sm bg-primary bg-opacity-10 text-primary me-3 rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ customer_data.customer.get_full_name|default:customer_data.customer.username }}</h6>
+                                        <small class="text-muted">{{ customer_data.customer.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3 text-end">{{ customer_data.orders|intcomma }}</td>
+                            <td class="py-3 text-end">{{ customer_data.quantity|intcomma }}</td>
+                            <td class="py-3 text-end fw-bold">ZMW {{ customer_data.revenue|floatformat:2|intcomma }}</td>
+                            <td class="py-3 text-end">ZMW {{ customer_data.average_order|floatformat:2|intcomma }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-exclamation-circle me-2"></i> No customer sales data for {{ start_date|default:'selected period' }} to {{ end_date|default:'selected period' }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if customer_sales %}
+                    <tfoot class="table-light">
+                        <tr>
+                            <th class="py-3">Total</th>
+                            <td class="py-3 text-end">{{ total_orders|intcomma }}</td>
+                            <td class="py-3 text-end">{{ total_quantity|intcomma }}</td>
+                            <td class="py-3 text-end">ZMW {{ total_revenue|floatformat:2|intcomma }}</td>
+                            <td class="py-3 text-end">-</td>
+                        </tr>
+                    </tfoot>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
+    }
+    
+    .table th,
+    .table td {
+        padding: 14px;
+        vertical-align: middle;
+        transition: background-color 0.3s ease;
+    }
+    
+    .table thead th {
+        background-color: #e9ecef;
+        color: #343a40;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f1f3f5;
+        cursor: default;
+    }
+    
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: white;
+    }
+    
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+    
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.6em 1.2em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    
+    .badge:hover {
+        transform: scale(1.05);
+    }
+    
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        transform: scale(1.05);
+    }
+    
+    .form-select,
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .form-select:focus,
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+    }
+    
+    .img-fluid {
+        transition: transform 0.3s ease;
+    }
+    
+    .img-fluid:hover {
+        transform: scale(1.1);
+    }
+    
+    .table-responsive {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+</style>
+{% endblock %} {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        { %
+            if report_type == 'daily'
+            or report_type == 'monthly' %
+        } { %
+            for product_data in report_data %
+        }
+        const ctx {
+            {
+                product_data.product.id
+            }
+        } = document.getElementById('chart-{{ product_data.product.id }}').getContext('2d');
+        new Chart(ctx {
+            {
+                product_data.product.id
+            }
+        }, {
+            type: 'line',
+            data: {
+                labels: [{ %
+                        for date,
+                        data in product_data.sales.items %
+                    }
+                    '{{ date }}' { %
+                        if not forloop.last %
+                    }, { % endif %
+                    } { % endfor %
+                    }
+                ],
+                datasets: [{
+                    label: 'Quantity Sold',
+                    data: [{ %
+                        for date,
+                        data in product_data.sales.items %
+                    } {
+                        {
+                            data.quantity
+                        }
+                    } { %
+                        if not forloop.last %
+                    }, { % endif %
+                    } { % endfor %
+                    }],
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    borderColor: 'rgba(13, 110, 253, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    yAxisID: 'y',
+                    pointStyle: 'circle',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }, {
+                    label: 'Revenue (ZMW)',
+                    data: [{ %
+                        for date,
+                        data in product_data.sales.items %
+                    } {
+                        {
+                            data.revenue
+                        }
+                    } { %
+                        if not forloop.last %
+                    }, { % endif %
+                    } { % endfor %
+                    }],
+                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    borderColor: 'rgba(25, 135, 84, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    yAxisID: 'y1',
+                    pointStyle: 'circle',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                family: 'Inter',
+                                size: 14,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            family: 'Inter',
+                            size: 14
+                        },
+                        bodyFont: {
+                            family: 'Inter',
+                            size: 12
+                        },
+                        padding: 12,
+                        cornerRadius: 8
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Quantity Sold',
+                            color: 'rgba(13, 110, 253, 1)',
+                            font: {
+                                family: 'Inter',
+                                size: 14,
+                                weight: '600'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Inter',
+                                size: 12
+                            }
+                        }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Revenue (ZMW)',
+                            color: 'rgba(25, 135, 84, 1)',
+                            font: {
+                                family: 'Inter',
+                                size: 14,
+                                weight: '600'
+                            }
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Inter',
+                                size: 12
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Inter',
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        }); { % endfor %
+        } { % endif %
+        }
+    });
+</script>
+{% endblock %}{% endblock %}
