@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block title %}Chat{% endblock %} {% block content %}
+<div class="container mt-4">
+    <h3>Your Conversations</h3>
+    <ul class="list-group">
+        {% for room in chat_rooms %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {% if room.buyer == request.user %} Chat with {{ room.seller.username }} {% else %} Chat with {{ room.buyer.username }} {% endif %}
+            <a href="{% url 'chat:chat_room' room_id=room.id %}" class="btn btn-sm btn-outline-primary">Open</a>
+        </li>
+        {% empty %}
+        <li class="list-group-item">You have no conversations yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

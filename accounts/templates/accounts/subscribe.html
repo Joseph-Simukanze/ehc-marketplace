@@ -1,0 +1,80 @@
+{% extends 'base.html' %} {% block title %}Subscribe - EHC Marketplace{% endblock %} {% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Subscribe to EHC Marketplace</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-crown fa-3x text-warning"></i>
+                    </div>
+                    <h4>Seller Subscription</h4>
+                    <p class="lead">ZMW 50.00 per month</p>
+                    <p class="text-muted mb-4">Subscribe to start selling your products on EHC Marketplace</p>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Benefits</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Post unlimited products</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Access to sales reports</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Direct messaging with buyers</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Receipt generation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Payment Methods</h5>
+                                <p>We accept the following payment methods:</p>
+                                <div class="d-flex justify-content-center gap-4 mt-3">
+                                    <div class="text-center">
+                                        <i class="fas fa-mobile-alt fa-2x text-primary mb-2"></i>
+                                        <p class="mb-0">MTN Mobile Money</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fas fa-mobile fa-2x text-danger mb-2"></i>
+                                        <p class="mb-0">Airtel Money</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %} {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="payment_method" class="form-label">Select Payment Method</label>
+                        <select name="payment_method" id="payment_method" class="form-select" required>
+                            <option value="">-- Select Payment Method --</option>
+                            <option value="mtn">MTN Mobile Money</option>
+                            <option value="airtel">Airtel Money</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label">Phone Number</label>
+                        <input type="text" name="phone_number" id="phone_number" class="form-control" placeholder="e.g. 26097XXXXXXX" required>
+                        <div class="form-text">Enter the phone number registered with your mobile money account.</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Subscribe Now</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

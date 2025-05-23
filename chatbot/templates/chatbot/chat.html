@@ -1,0 +1,23 @@
+{% extends 'base.html' %} {% block content %}
+<h2>Ask EHC AI Bot</h2>
+<div class="mb-3">
+    <input id="chatInput" class="form-control" placeholder="Ask me something...">
+</div>
+<button onclick="sendToBot()" class="btn btn-primary mb-3">Send</button>
+<div id="chatOutput" class="border p-3 rounded bg-light"></div>
+
+<script>
+    function sendToBot() {
+        const input = document.getElementById('chatInput');
+        const message = input.value;
+        input.value = '';
+        fetch(`/chatbot/respond/?message=` + encodeURIComponent(message))
+            .then(res => res.json())
+            .then(data => {
+                const output = document.getElementById('chatOutput');
+                output.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+                output.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+            });
+    }
+</script>
+{% endblock %}

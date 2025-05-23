@@ -1,0 +1,175 @@
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block title %}My Profile - EHC Marketplace{% endblock %} {% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Left panel: Account Info -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-circle me-2"></i>Account Information
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px; background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);">
+                            <i class="fas fa-user fa-4x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold">{{ user.username }}</h4>
+                        <p class="text-muted mb-2">{{ user.email }}</p>
+                        <span class="badge bg-{% if user.is_subscription_active %}success{% else %}secondary{% endif %} rounded-pill px-3 py-1">
+                            {{ user.is_subscription_active|yesno:"Premium,Basic" }} Account
+                        </span>
+                    </div>
+
+                    <ul class="list-group list-group-flush border-top">
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-semibold">
+                                <i class="bi bi-person-badge me-2 text-primary"></i>Account Type
+                            </span>
+                            <span class="badge bg-{% if user.is_seller %}warning{% else %}info{% endif %} rounded-pill px-3 py-1">
+                                {{ user.is_seller|yesno:"Seller,Buyer" }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-semibold">
+                                <i class="bi bi-calendar-check me-2 text-primary"></i>Member Since
+                            </span>
+                            <span>{{ user.date_joined|date:"M d, Y" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <span class="fw-semibold">
+                                <i class="bi bi-shield-lock me-2 text-primary"></i>Account Status
+                            </span>
+                            <span class="badge bg-success rounded-pill px-3 py-1">Verified</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-light py-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'accounts:subscription_status' %}" class="btn btn-outline-primary btn-lg rounded-pill">
+                            <i class="bi bi-credit-card me-2"></i>Manage Subscription
+                        </a>
+                        <a href="{% url 'accounts:delete_account' %}" class="btn btn-outline-danger btn-lg rounded-pill">
+                            <i class="bi bi-trash me-2"></i>Delete Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right panel: Edit Profile + Messages -->
+        <div class="col-lg-8">
+            <!-- Edit Profile Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ form.first_name|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.last_name|as_crispy_field }}
+                            </div>
+                            <div class="col-12">
+                                {{ form.email|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.phone_number|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.location|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill py-2">
+                                <i class="bi bi-save me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Messages Card -->
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-success text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-chat-left-text me-2"></i>Messages
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if chat_rooms %}
+                    <div class="list-group list-group-flush">
+                        {% for chat in chat_rooms %}
+                        <div class="list-group-item border-0 px-0 py-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar bg-light rounded-circle me-3" style="width: 40px; height: 40px;">
+                                        <i class="fas fa-user text-muted d-flex justify-content-center align-items-center h-100"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">{{ chat.other_user.username }}</h6>
+                                        <small class="text-muted">Seller</small>
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ chat.last_message.timestamp|date:"M d, h:i A" }}</small>
+                            </div>
+
+                            {% if chat.last_message %}
+                            <div class="ps-5">
+                                <p class="mb-2">{{ chat.last_message.content|truncatechars:120 }}</p>
+                                <a href="{% url 'chat:chat_room' chat.id %}" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                        Continue Chat <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                            </div>
+                            {% else %}
+                            <div class="ps-5">
+                                <p class="text-muted mb-2">No messages yet</p>
+                                <a href="{% url 'chat:chat_room' chat.id %}" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                        Start Chat <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if not forloop.last %}
+                        <hr class="my-2">{% endif %} {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-chat-square-text display-6 text-muted mb-3"></i>
+                        <h5 class="text-muted">No messages yet</h5>
+                        <p class="text-muted">When sellers contact you, messages will appear here</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

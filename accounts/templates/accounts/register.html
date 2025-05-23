@@ -1,0 +1,159 @@
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block title %}Register - EHC Marketplace{% endblock %} {% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h4 class="mb-0" role="heading" aria-level="1">Create an Account</h4>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" novalidate aria-describedby="form-instructions">
+                        {% csrf_token %}
+                        <p id="form-instructions" class="sr-only">All fields are required unless marked optional.</p>
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                {{ form.username|as_crispy_field }}
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                {{ form.email|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                {{ form.phone_number|as_crispy_field }}
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                {{ form.location|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.is_seller|as_crispy_field }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                {{ form.password1|as_crispy_field }}
+                                <small class="form-text text-muted">
+                                    Password must be at least 8 characters, including a number, uppercase, and special character.
+                                </small>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                {{ form.password2|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <!-- Password Generation Section -->
+                        <div class="mb-3">
+                            <label for="generated-password" class="form-label">Generated Password</label>
+                            <div class="input-group">
+                                <input type="text" id="generated-password" class="form-control" readonly aria-describedby="generate-password-btn copy-password-btn">
+                                <button type="button" id="generate-password-btn" class="btn btn-outline-secondary">Generate Password</button>
+                                <button type="button" id="copy-password-btn" class="btn btn-outline-secondary" disabled>Copy</button>
+                            </div>
+                            <small class="form-text text-muted">Click "Generate Password" to create a secure password, then copy it.</small>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light text-center py-3">
+                    <p class="mb-0">Already have an account? <a href="{% url 'accounts:login' %}" class="text-primary">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Login Form Section (you may not need this here) -->
+<form method="POST">
+    {% csrf_token %}
+    <!-- Add your login fields here, e.g. username and password inputs -->
+    <input type="submit" value="Login">
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password strength validation
+        const passwordField = document.querySelector('#id_password1');
+        const passwordHelp = document.createElement('div');
+        passwordHelp.className = 'form-text';
+        passwordField.parentNode.appendChild(passwordHelp);
+
+        passwordField.addEventListener('input', function() {
+            const value = passwordField.value;
+            const minLength = value.length >= 8;
+            const hasNumber = /\d/.test(value);
+            const hasUpper = /[A-Z]/.test(value);
+            const hasSpecial = /[!@#$%^&*]/.test(value);
+
+            if (value.length === 0) {
+                passwordHelp.textContent = '';
+            } else if (minLength && hasNumber && hasUpper && hasSpecial) {
+                passwordHelp.textContent = 'Strong password';
+                passwordHelp.style.color = 'green';
+            } else {
+                passwordHelp.textContent = 'Weak password: Must be 8+ characters, include a number, uppercase, and special character';
+                passwordHelp.style.color = 'red';
+            }
+        });
+
+        // Password generation
+        const generateBtn = document.querySelector('#generate-password-btn');
+        const copyBtn = document.querySelector('#copy-password-btn');
+        const generatedPasswordField = document.querySelector('#generated-password');
+        const password1Field = document.querySelector('#id_password1');
+        const password2Field = document.querySelector('#id_password2');
+
+        generateBtn.addEventListener('click', function() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            const passwordLength = 12;
+            let password = '';
+            for (let i = 0; i < passwordLength; i++) {
+                const randomIndex = Math.floor(Math.random() * chars.length);
+                password += chars[randomIndex];
+            }
+
+            // Ensure password meets all requirements
+            if (!/\d/.test(password)) password += '1';
+            if (!/[A-Z]/.test(password)) password += 'A';
+            if (!/[!@#$%^&*]/.test(password)) password += '@';
+
+            // Shuffle the password to randomize the appended characters
+            password = password.split('').sort(() => Math.random() - 0.5).join('');
+
+            // Populate fields
+            generatedPasswordField.value = password;
+            password1Field.value = password;
+            password2Field.value = password;
+
+            // Enable copy button
+            copyBtn.disabled = false;
+
+            // Trigger password strength validation
+            const event = new Event('input');
+            password1Field.dispatchEvent(event);
+        });
+
+        // Copy password to clipboard
+        copyBtn.addEventListener('click', function() {
+            generatedPasswordField.select();
+            document.execCommand('copy');
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy';
+            }, 2000);
+        });
+    });
+</script>
+{% endblock %}
